@@ -1,0 +1,22 @@
+server:
+  # 网关服务端口
+  port: 8080
+
+spring:
+  application:
+    # 当前应用名称（注册到 Nacos 的服务名）
+    name: gateway
+  config:
+    # 引入公共配置（Redis、Nacos 等）
+    import:
+      - classpath:cache.yml
+      - classpath:config.yml
+  cloud:
+    nacos:
+      discovery:
+        server-addr: 192.168.147.102:8848
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
