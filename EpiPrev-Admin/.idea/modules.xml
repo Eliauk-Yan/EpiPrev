@@ -2,7 +2,7 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/EpiPrev-Vue.iml" filepath="$PROJECT_DIR$/.idea/EpiPrev-Vue.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/EpiPrev-Admin.iml" filepath="$PROJECT_DIR$/.idea/EpiPrev-Admin.iml" />
     </modules>
   </component>
 </project>
