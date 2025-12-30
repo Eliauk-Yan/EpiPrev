@@ -1,6 +1,8 @@
 import { createApp } from "vue";
 // 引入 App
 import App from "./App.vue";
+// 引入全局样式
+import "./style.css";
 // 引入 UnoCSS
 import "virtual:uno.css";
 // 导入路由
