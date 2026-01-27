@@ -1,6 +1,8 @@
 package com.epiprev.server.common.result;
 
 import com.epiprev.server.common.result.enums.ResultCode;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.List;
 
@@ -10,7 +12,9 @@ import java.util.List;
  * 2. 前端只关心 records / total / page / size，不可控。
  * ...分层解耦，接口稳定，ORM替换成本，前端友好，语义清晰，测试Mock方便
  */
-public class MultiResult <T> extends Result<List<T>> {
+@Data
+@EqualsAndHashCode(callSuper = true)
+public class MultiResult<T> extends Result<List<T>> {
 
     private long total;
 
@@ -30,7 +34,8 @@ public class MultiResult <T> extends Result<List<T>> {
     }
 
     public static <T> MultiResult<T> multiSuccess(List<T> data, long total, long page, long size) {
-        return new MultiResult<>(true, ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), data, total, page, size);
+        return new MultiResult<>(true, ResultCode.SUCCESS.getCode(), ResultCode.SUCCESS.getMessage(), data, total, page,
+                size);
     }
 
     public static <T> MultiResult<T> multiError(ResultCode resultCode) {

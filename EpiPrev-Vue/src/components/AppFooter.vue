@@ -1,7 +1,7 @@
 <template>
   <footer class="footer">
     <div class="footer-content">
-      <p>© 2024 传染病预防宣传系统 | 提高公众健康意识，共建健康中国</p>
+      <p>© 2026 传染病预防宣传系统 | 提高公众健康意识，共建健康中国</p>
     </div>
   </footer>
 </template>

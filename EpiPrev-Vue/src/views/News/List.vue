@@ -1,19 +1,50 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { getNewsList } from "@/api/news"; // Import the API function
 
-import request from "@/utils/request";
 const router = useRouter();
 
 const newsList = ref<any[]>([]);
-
-onMounted(async () => {
-    const res: any = await request.get("/news/list");
-    newsList.value = res.records;
+const total = ref(0);
+const loading = ref(false);
+const queryParams = ref({
+  page: 1,
+  size: 10,
+  keyword: "",
 });
 
-const getLevelType = (level: string) => {
-  return level === "warning" ? "warning" : "info";
+const loadNews = async () => {
+  loading.value = true;
+  try {
+    const res: any = await getNewsList(queryParams.value);
+    newsList.value = res.records;
+    total.value = res.total;
+  } catch (error) {
+    console.error("Failed to load news:", error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const handleSearch = () => {
+  queryParams.value.page = 1;
+  loadNews();
+};
+
+const handleCurrentChange = (page: number) => {
+  queryParams.value.page = page;
+  loadNews();
+};
+
+onMounted(() => {
+  loadNews();
+});
+
+const getLevelType = (source: string) => {
+    // Simple logic to color code sources if needed, or stick to 'info'
+    if (source.includes('卫健委') || source.includes('CDC')) return 'primary';
+    return 'info';
 };
 </script>
 
@@ -24,7 +55,25 @@ const getLevelType = (level: string) => {
       <p>及时了解最新疫情信息和防控政策</p>
     </div>
 
-    <div class="news-list">
+    <!-- Search Section -->
+    <div class="search-bar">
+      <el-input
+        v-model="queryParams.keyword"
+        placeholder="搜索新闻标题或内容..."
+        class="search-input"
+        clearable
+        @clear="handleSearch"
+        @keyup.enter="handleSearch"
+      >
+        <template #append>
+          <el-button @click="handleSearch">
+             <el-icon><Search /></el-icon>
+          </el-button>
+        </template>
+      </el-input>
+    </div>
+
+    <div class="news-list" v-loading="loading">
       <div
         v-for="news in newsList"
         :key="news.id"
@@ -32,17 +81,30 @@ const getLevelType = (level: string) => {
         @click="router.push(`/news/${news.id}`)"
       >
         <div class="news-date">
-          <span class="day">{{ news.date.split('-')[2] }}</span>
-          <span class="month">{{ news.date.split('-')[1] }}月</span>
+          <span class="day">{{ news.publishTime ? news.publishTime.substring(8, 10) : '01' }}</span>
+          <span class="month">{{ news.publishTime ? news.publishTime.substring(5, 7) : '01' }}月</span>
         </div>
         <div class="news-content">
           <div class="news-header">
-            <el-tag :type="getLevelType(news.level)" size="small">{{ news.source }}</el-tag>
+            <el-tag :type="getLevelType(news.source)" size="small">{{ news.source }}</el-tag>
           </div>
           <h3 class="news-title">{{ news.title }}</h3>
           <p class="news-summary">{{ news.summary }}</p>
         </div>
       </div>
+      <el-empty v-if="!loading && newsList.length === 0" description="暂无相关新闻" />
+    </div>
+    
+    <!-- Pagination -->
+    <div class="pagination-container" v-if="total > 0">
+      <el-pagination
+        background
+        layout="prev, pager, next"
+        :total="total"
+        v-model:current-page="queryParams.page"
+        :page-size="queryParams.size"
+        @current-change="handleCurrentChange"
+      />
     </div>
   </div>
 </template>
@@ -50,6 +112,8 @@ const getLevelType = (level: string) => {
 <style scoped>
 .news-page {
   padding: 20px 0;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .page-header {
@@ -67,10 +131,22 @@ const getLevelType = (level: string) => {
   color: #909399;
 }
 
+.search-bar {
+  margin-bottom: 24px;
+  display: flex;
+  justify-content: center;
+}
+
+.search-input {
+  width: 100%;
+  max-width: 500px;
+}
+
 .news-list {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-height: 200px;
 }
 
 .news-card {
@@ -81,6 +157,7 @@ const getLevelType = (level: string) => {
   gap: 24px;
   cursor: pointer;
   transition: all 0.2s;
+  box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.05); /* Added shadow for better visibility */
 }
 
 .news-card:hover {
@@ -121,11 +198,22 @@ const getLevelType = (level: string) => {
   font-size: 18px;
   color: #303133;
   margin-bottom: 8px;
+  font-weight: bold; /* Make title bold */
 }
 
 .news-summary {
   color: #606266;
   font-size: 14px;
   line-height: 1.6;
+  display: -webkit-box; /* Ellipsis for multiple lines */
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 24px;
 }
 </style>

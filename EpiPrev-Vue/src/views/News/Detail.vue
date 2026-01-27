@@ -32,7 +32,7 @@ onMounted(async () => {
         <el-tag type="info">{{ news.source }}</el-tag>
         <h1>{{ news.title }}</h1>
         <div class="article-meta">
-          <span>📅 {{ news.date }}</span>
+          <span>📅 {{ news.publishTime ? news.publishTime.replace('T', ' ') : '' }}</span>
         </div>
       </header>
 

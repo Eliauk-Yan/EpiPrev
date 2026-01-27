@@ -1,15 +1,22 @@
 <script setup lang="ts">
+import { computed } from "vue";
+import { useRoute } from "vue-router";
 import AppHeader from "@/components/AppHeader.vue";
 import AppFooter from "@/components/AppFooter.vue";
+
+const route = useRoute();
+const showLayout = computed(() => {
+  return !['login', 'register'].includes(route.name as string);
+});
 </script>
 
 <template>
   <div class="app-container">
-    <AppHeader />
+    <AppHeader v-if="showLayout" />
     <main class="main-content">
       <RouterView />
     </main>
-    <AppFooter />
+    <AppFooter v-if="showLayout" />
   </div>
 </template>
 
@@ -22,9 +29,8 @@ import AppFooter from "@/components/AppFooter.vue";
 
 .main-content {
   flex: 1;
-  padding: 20px;
-  max-width: 1200px;
-  margin: 0 auto;
   width: 100%;
+  position: relative;
+  /* padding and max-width removed to allow full-screen designs */
 }
 </style>

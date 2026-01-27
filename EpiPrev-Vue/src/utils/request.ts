@@ -19,6 +19,17 @@ instance.interceptors.response.use(
     (response) => {
         const res = response.data;
         if (res.success) {
+            // 判断是否是分页响应（包含 total, page, size 字段）
+            if (res.total !== undefined && res.page !== undefined && res.size !== undefined) {
+                // 分页响应，返回完整的分页对象
+                return {
+                    data: res.data,
+                    total: res.total,
+                    page: res.page,
+                    size: res.size
+                };
+            }
+            // 普通响应，只返回 data
             return res.data;
         } else {
             ElMessage.error(res.message || "请求出错");
