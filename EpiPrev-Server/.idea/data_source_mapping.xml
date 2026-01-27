@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<project version="4">
-  <component name="DataSourcePerFileMappings">
-    <file url="file://$PROJECT_DIR$/sql/epiprev.sql" value="643390a7-7cc5-42f2-afda-26115620bdb0" />
-    <file url="file://$PROJECT_DIR$/sql/nacos_config.sql" value="643390a7-7cc5-42f2-afda-26115620bdb0" />
-  </component>
-</project>

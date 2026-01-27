@@ -3,6 +3,7 @@ import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import { useUserStore } from "@/stores/user";
 import type { FormInstance, FormRules } from "element-plus";
+import { ElMessage } from "element-plus";
 
 const router = useRouter();
 const userStore = useUserStore();
