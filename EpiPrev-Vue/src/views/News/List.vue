@@ -1,43 +1,16 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 
+import request from "@/utils/request";
 const router = useRouter();
 
-const newsList = ref([
-  {
-    id: 1,
-    title: "全国流感监测周报（2024年第2周）",
-    summary: "本周全国流感活动水平持续下降，但仍处于流行期。各地应继续加强监测和防控。",
-    date: "2024-01-15",
-    source: "国家疾控中心",
-    level: "info",
-  },
-  {
-    id: 2,
-    title: "关于加强冬春季传染病防控的通知",
-    summary: "冬春季是呼吸道传染病高发季节，各地要做好防控准备工作。",
-    date: "2024-01-12",
-    source: "国家卫健委",
-    level: "warning",
-  },
-  {
-    id: 3,
-    title: "诺如病毒感染性腹泻防控提示",
-    summary: "近期诺如病毒感染性腹泻进入高发期，请注意饮食卫生。",
-    date: "2024-01-10",
-    source: "地方疾控中心",
-    level: "info",
-  },
-  {
-    id: 4,
-    title: "手足口病防控知识手册发布",
-    summary: "为帮助家长和学校做好手足口病预防，特发布本防控知识手册。",
-    date: "2024-01-08",
-    source: "国家卫健委",
-    level: "info",
-  },
-]);
+const newsList = ref<any[]>([]);
+
+onMounted(async () => {
+    const res: any = await request.get("/news/list");
+    newsList.value = res.records;
+});
 
 const getLevelType = (level: string) => {
   return level === "warning" ? "warning" : "info";

@@ -1,51 +1,37 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { useRouter } from "vue-router";
+
+import request from "@/utils/request";
 
 const router = useRouter();
 
 const categories = ["全部", "呼吸道传染病", "消化道传染病", "血液传染病", "接触传染病"];
 const activeCategory = ref("全部");
 
-const articles = ref([
-  {
-    id: 1,
-    title: "新冠病毒防护指南",
-    category: "呼吸道传染病",
-    summary: "了解新冠病毒的传播途径和日常防护措施，保护自己和家人的健康。",
-    date: "2024-01-15",
-    views: 2341,
-  },
-  {
-    id: 2,
-    title: "流感季节如何预防",
-    category: "呼吸道传染病",
-    summary: "流感高发季节，掌握正确的预防方法，减少感染风险。",
-    date: "2024-01-10",
-    views: 1856,
-  },
-  {
-    id: 3,
-    title: "诺如病毒防治知识",
-    category: "消化道传染病",
-    summary: "诺如病毒引起的急性胃肠炎如何预防和治疗。",
-    date: "2024-01-08",
-    views: 1234,
-  },
-  {
-    id: 4,
-    title: "手足口病预防要点",
-    category: "接触传染病",
-    summary: "儿童高发的手足口病，家长需要了解的预防知识。",
-    date: "2024-01-05",
-    views: 987,
-  },
-]);
+const articles = ref<any[]>([]);
 
-const filteredArticles = () => {
-  if (activeCategory.value === "全部") return articles.value;
-  return articles.value.filter((a) => a.category === activeCategory.value);
+const fetchArticles = async () => {
+  try {
+    const res: any = await request.get("/knowledge/list", {
+      params: {
+        category: activeCategory.value === "全部" ? undefined : activeCategory.value,
+      },
+    });
+    articles.value = res.records;
+  } catch (error) {
+    // handled
+  }
 };
+
+watch(activeCategory, () => {
+  fetchArticles();
+});
+
+onMounted(() => {
+  fetchArticles();
+});
+
 </script>
 
 <template>
@@ -68,7 +54,7 @@ const filteredArticles = () => {
 
     <div class="article-list">
       <div
-        v-for="article in filteredArticles()"
+        v-for="article in articles"
         :key="article.id"
         class="article-card"
         @click="router.push(`/knowledge/${article.id}`)"

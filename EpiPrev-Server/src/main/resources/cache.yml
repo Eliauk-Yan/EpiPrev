@@ -1,0 +1,47 @@
+# redis 配置
+spring:
+  data:
+    redis:
+      host: 47.99.39.81 # redis 地址
+      port: 6379 # redis 端口
+      username: zhangbo
+      password: 2I0h2AdnMGM81fVtLw+gYA== # redis 密码
+      lettuce: # lettuce 连接池
+        pool: # 连接池
+          max-active: 32 # 连接池最大连接数
+          max-idle: 16 # 连接池最大空闲数
+          min-idle: 8 # 连接池最小空闲数
+  # Redisson 配置
+  redis:
+    redisson:
+      config: |
+        singleServerConfig: 
+          address: "redis://47.99.39.81:6379"
+          username: zhangbo
+          password: 2I0h2AdnMGM81fVtLw+gYA==
+          connectionPoolSize: 64
+          connectionMinimumIdleSize: 24
+          idleConnectionTimeout: 10000
+          connectTimeout: 10000
+          timeout: 3000
+          retryAttempts: 3
+          retryInterval: 1500
+        threads: 16
+        nettyThreads: 32
+        codec: !<org.redisson.codec.Kryo5Codec> {}
+        transportMode: "NIO"
+# JetCache 配置
+jetcache:
+  statIntervalMinutes: 15 # 统计间隔
+  areaInCacheName: false # 缓存名称中不包含 area
+  local: # 本地一级缓存
+    default:
+      type: caffeine # 缓存类型
+      keyConvertor: fastjson2 # 缓存 key 转换器
+  remote: # 远程二级缓存
+    default:
+      type: redisson # 缓存类型
+      keyConvertor: fastjson2 # 缓存 key 转换器
+      valueEncoder: java # 缓存 value 编码器，将 value 转换成 byte[]
+      valueDecoder: java # 缓存 value 解码器，将 byte[] 转换成 value
+

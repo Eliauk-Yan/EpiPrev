@@ -2,6 +2,7 @@
 import { useUserStore } from "@/stores/user";
 import { useRouter } from "vue-router";
 
+
 const userStore = useUserStore();
 const router = useRouter();
 
@@ -13,8 +14,8 @@ const navItems = [
   { name: "健康管理", path: "/health" },
 ];
 
-const handleLogout = () => {
-  userStore.logout();
+const handleLogout = async () => {
+  await userStore.logout();
   router.push("/");
 };
 </script>

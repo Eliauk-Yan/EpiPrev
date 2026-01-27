@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useUserStore } from "@/stores/user";
 import { ElMessage } from "element-plus";
 
@@ -8,71 +8,52 @@ const userStore = useUserStore();
 const newPostVisible = ref(false);
 const newPost = ref({ title: "", content: "" });
 
-const posts = ref([
-  {
-    id: 1,
-    title: "流感疫苗有必要每年打吗？",
-    author: "健康小助手",
-    date: "2024-01-14",
-    replies: 12,
-    content: "最近看到很多关于流感疫苗的讨论，想问一下大家流感疫苗是不是需要每年都打？",
-    comments: [
-      { author: "医学达人", content: "是的，流感病毒变异较快，建议每年接种。", date: "2024-01-14" },
-      { author: "疾控专家", content: "尤其是老人、儿童等高风险人群，建议每年接种。", date: "2024-01-14" },
-    ],
-  },
-  {
-    id: 2,
-    title: "如何正确佩戴口罩？",
-    author: "防护先锋",
-    date: "2024-01-13",
-    replies: 8,
-    content: "很多人戴口罩的方式都不对，分享一下正确的佩戴方法。",
-    comments: [
-      { author: "护士小张", content: "口罩要完全覆盖口鼻，鼻夹要压紧。", date: "2024-01-13" },
-    ],
-  },
-  {
-    id: 3,
-    title: "孩子得了手足口病怎么护理？",
-    author: "宝妈小王",
-    date: "2024-01-12",
-    replies: 15,
-    content: "孩子幼儿园有小朋友得了手足口病，想了解一下如何预防和护理。",
-    comments: [],
-  },
-]);
+import request from "@/utils/request";
 
-const selectedPost = ref<typeof posts.value[0] | null>(null);
+const posts = ref<any[]>([]);
+
+const fetchPosts = async () => {
+  const res: any = await request.get("/forum/list");
+  posts.value = res.records;
+};
+
+onMounted(() => {
+  fetchPosts();
+});
+
+const selectedPost = ref<any | null>(null);
 const newComment = ref("");
 
-const handleSubmitPost = () => {
+const handleSubmitPost = async () => {
   if (!newPost.value.title || !newPost.value.content) {
     ElMessage.warning("请填写完整信息");
     return;
   }
-  posts.value.unshift({
-    id: Date.now(),
-    title: newPost.value.title,
-    author: userStore.user?.username || "匿名用户",
-    date: new Date().toISOString().split("T")[0],
-    replies: 0,
-    content: newPost.value.content,
-    comments: [],
-  });
+  await request.post("/forum/post", newPost.value);
+  
   newPost.value = { title: "", content: "" };
   newPostVisible.value = false;
   ElMessage.success("发布成功");
+  fetchPosts();
 };
 
-const handleSubmitComment = () => {
+const handleSubmitComment = async () => {
   if (!newComment.value || !selectedPost.value) return;
-  selectedPost.value.comments.push({
-    author: userStore.user?.username || "匿名用户",
-    content: newComment.value,
-    date: new Date().toISOString().split("T")[0],
+  
+  await request.post("/forum/comment", {
+    postId: selectedPost.value.id,
+    content: newComment.value
   });
-  selectedPost.value.replies++;
+  
+  // Refresh comments locally or re-fetch
+  // For simplicity, re-fetch list and finding the selected one is easiest but inefficient
+  // Let's just push to local
+  selectedPost.value.comments.push({
+    author: userStore.user?.username || "我",
+    content: newComment.value,
+    date: new Date().toISOString() // Backend returns Date array usually but we can use string for now
+  });
+  
   newComment.value = "";
   ElMessage.success("评论成功");
 };

@@ -1,0 +1,9 @@
+server:
+  port: 8888
+spring:
+  application:
+    name: epiperv
+  config:
+    import:
+      - classpath:/datasource.yml # 数据源配置
+      - classpath:/cache.yml # 缓存配置

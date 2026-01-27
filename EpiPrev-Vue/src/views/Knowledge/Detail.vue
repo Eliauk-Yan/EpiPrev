@@ -1,48 +1,21 @@
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { useRoute, useRouter } from "vue-router";
+
+import request from "@/utils/request";
 
 const route = useRoute();
 const router = useRouter();
 
-const article = ref({
-  id: Number(route.params.id),
-  title: "新冠病毒防护指南",
-  category: "呼吸道传染病",
-  date: "2024-01-15",
-  views: 2341,
-  content: `
-## 什么是新冠病毒
+const article = ref<any>({});
 
-新型冠状病毒（COVID-19）是一种主要通过呼吸道飞沫和密切接触传播的病毒。
-
-## 传播途径
-
-1. **飞沫传播**：感染者咳嗽、打喷嚏时产生的飞沫
-2. **接触传播**：接触被病毒污染的物体表面后触摸口鼻眼
-3. **气溶胶传播**：在密闭空间内长时间暴露
-
-## 预防措施
-
-### 日常防护
-- 正确佩戴口罩
-- 勤洗手，使用肥皂或洗手液
-- 保持社交距离
-- 避免前往人群密集场所
-
-### 居家防护
-- 定期开窗通风
-- 对常接触物品进行消毒
-- 保持良好的个人卫生习惯
-
-## 出现症状怎么办
-
-如出现发热、咳嗽、乏力等症状，应：
-1. 及时佩戴口罩
-2. 避免乘坐公共交通
-3. 前往发热门诊就诊
-4. 如实告知医生旅居史和接触史
-  `,
+onMounted(async () => {
+  try {
+    const res = await request.get(`/knowledge/${route.params.id}`);
+    article.value = res;
+  } catch (error) {
+    //
+  }
 });
 </script>
 

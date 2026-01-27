@@ -1,16 +1,14 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useUserStore } from "@/stores/user";
 import { ElMessage } from "element-plus";
 
 const userStore = useUserStore();
 
+import request from "@/utils/request";
+
 // 健康记录
-const healthRecords = ref([
-  { date: "2024-01-15", weight: 65, sleep: 7.5, mood: "😊" },
-  { date: "2024-01-14", weight: 65.2, sleep: 6.5, mood: "😐" },
-  { date: "2024-01-13", weight: 64.8, sleep: 8, mood: "😊" },
-]);
+const healthRecords = ref<any[]>([]);
 
 const newRecord = ref({
   weight: "",
@@ -52,27 +50,40 @@ const exercises = [
   },
 ];
 
-const handleAddRecord = () => {
+const fetchRecords = async () => {
+    if (userStore.isLoggedIn) {
+        const res: any = await request.get("/health/list");
+        healthRecords.value = res;
+    }
+};
+
+onMounted(() => {
+    fetchRecords();
+});
+
+const handleAddRecord = async () => {
   if (!newRecord.value.weight || !newRecord.value.sleep) {
     ElMessage.warning("请填写完整信息");
     return;
   }
-  healthRecords.value.unshift({
-    date: new Date().toISOString().split("T")[0],
-    weight: Number(newRecord.value.weight),
-    sleep: Number(newRecord.value.sleep),
-    mood: newRecord.value.mood,
+  
+  await request.post("/health/add", {
+    weight: newRecord.value.weight,
+    sleepHours: newRecord.value.sleep,
+    mood: newRecord.value.mood
   });
+  
   newRecord.value = { weight: "", sleep: "", mood: "😊" };
   ElMessage.success("记录成功");
+  fetchRecords();
 };
 
 // 计算统计数据
 const stats = computed(() => {
   const records = healthRecords.value;
   if (records.length === 0) return null;
-  const avgWeight = (records.reduce((a, b) => a + b.weight, 0) / records.length).toFixed(1);
-  const avgSleep = (records.reduce((a, b) => a + b.sleep, 0) / records.length).toFixed(1);
+  const avgWeight = (records.reduce((a, b) => a + Number(b.weight), 0) / records.length).toFixed(1);
+  const avgSleep = (records.reduce((a, b) => a + Number(b.sleepHours), 0) / records.length).toFixed(1);
   return { avgWeight, avgSleep, totalDays: records.length };
 });
 </script>
@@ -123,7 +134,7 @@ const stats = computed(() => {
           <el-table :data="healthRecords" stripe>
             <el-table-column prop="date" label="日期" width="120" />
             <el-table-column prop="weight" label="体重(kg)" width="100" />
-            <el-table-column prop="sleep" label="睡眠(h)" width="100" />
+            <el-table-column prop="sleepHours" label="睡眠(h)" width="100" />
             <el-table-column prop="mood" label="心情" width="80" />
           </el-table>
         </div>

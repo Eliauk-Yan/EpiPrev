@@ -1,17 +1,18 @@
 <script setup lang="ts">
 import { reactive, ref } from "vue";
-import { useRouter } from "vue-router";
+import { useRouter, useRoute } from "vue-router";
 import { useUserStore } from "@/stores/user";
 import type { FormInstance, FormRules } from "element-plus";
 import { ElMessage } from "element-plus";
 
 const router = useRouter();
+const route = useRoute();
 const userStore = useUserStore();
 const formRef = ref<FormInstance>();
 const loading = ref(false);
 
 const form = reactive({
-  username: "",
+  username: (route.query.username as string) || "",
   password: "",
 });
 
@@ -22,19 +23,18 @@ const rules: FormRules = {
 
 const handleSubmit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
-  await formEl.validate((valid) => {
+  await formEl.validate(async (valid) => {
     if (valid) {
       loading.value = true;
-      // 模拟登录
-      setTimeout(() => {
-        userStore.login(
-          { id: 1, username: form.username, email: `${form.username}@example.com` },
-          "mock-token"
-        );
+      try {
+        await userStore.login(form);
         ElMessage.success("登录成功");
         router.push("/");
+      } catch (error) {
+        // Error handled by interceptor or store
+      } finally {
         loading.value = false;
-      }, 500);
+      }
     }
   });
 };

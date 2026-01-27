@@ -3,6 +3,7 @@ import { reactive, ref } from "vue";
 import { useRouter } from "vue-router";
 import type { FormInstance, FormRules } from "element-plus";
 import { ElMessage } from "element-plus";
+import { register } from "@/api/user";
 
 const router = useRouter();
 const formRef = ref<FormInstance>();
@@ -44,14 +45,25 @@ const rules: FormRules = {
 
 const handleSubmit = async (formEl: FormInstance | undefined) => {
   if (!formEl) return;
-  await formEl.validate((valid) => {
+  await formEl.validate(async (valid) => {
     if (valid) {
       loading.value = true;
-      setTimeout(() => {
+      try {
+        await register({
+            username: form.username,
+            password: form.password,
+            email: form.email
+        });
         ElMessage.success("注册成功，请登录");
-        router.push("/login");
+        await router.push({
+          path: "/login",
+          query: {username: form.username},
+        });
+      } catch (error) {
+        // Error handled
+      } finally {
         loading.value = false;
-      }, 500);
+      }
     }
   });
 };
