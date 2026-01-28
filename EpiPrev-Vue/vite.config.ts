@@ -15,7 +15,7 @@ export default defineConfig({
     vue(),
     // UnoCSS
     UnoCSS(),
-    // 引入ElementPlus自动导入
+    // 引入ElementPlus自动导入（包含反馈类组件样式）
     AutoImport({
       resolvers: [ElementPlusResolver()],
     }),

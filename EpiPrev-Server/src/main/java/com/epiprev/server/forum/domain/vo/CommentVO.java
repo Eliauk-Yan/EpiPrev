@@ -1,4 +1,4 @@
-package com.epiprev.server.forum.vo;
+package com.epiprev.server.forum.domain.vo;
 
 import lombok.Data;
 

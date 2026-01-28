@@ -7,7 +7,3 @@ spring:
     import:
       - classpath:/datasource.yml # 数据源配置
       - classpath:/cache.yml # 缓存配置
-
-tianapi:
-  key: INSERT_YOUR_API_KEY_HERE # 请替换为您申请的 API Key
-  url: https://apis.tianapi.com/health/index

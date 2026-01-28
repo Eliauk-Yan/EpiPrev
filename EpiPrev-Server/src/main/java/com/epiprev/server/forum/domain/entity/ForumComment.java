@@ -1,4 +1,4 @@
-package com.epiprev.server.forum.entity;
+package com.epiprev.server.forum.domain.entity;
 import com.epiprev.server.common.entity.BaseEntity;
 
 import com.baomidou.mybatisplus.annotation.TableName;

@@ -1,4 +1,4 @@
-package com.epiprev.server.forum.dto;
+package com.epiprev.server.forum.domain.dto;
 
 import lombok.Data;
 
