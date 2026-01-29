@@ -6,6 +6,8 @@ export interface UserInfo {
     username: string;
     email: string;
     avatar: string;
+    phone: string;
+    createTime: string;
 }
 
 /** Login Data */
@@ -42,4 +44,22 @@ export function register(data: RegisterData) {
 /** Logout API */
 export function logout() {
     return request.post<any, boolean>("/auth/logout");
+}
+
+/** User Update Data */
+export interface UserUpdateData {
+    username?: string;
+    email?: string;
+    phone?: string;
+    avatar?: string;
+}
+
+/** Get User Info API */
+export function getUserInfo() {
+    return request.get<any, UserInfo>("/user/info");
+}
+
+/** Update User Info API */
+export function updateUserInfo(data: UserUpdateData) {
+    return request.put<any, void>("/user/info", data);
 }

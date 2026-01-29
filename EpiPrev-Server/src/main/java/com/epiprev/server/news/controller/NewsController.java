@@ -1,32 +1,29 @@
 package com.epiprev.server.news.controller;
+
 import com.epiprev.server.common.result.Result;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
 import com.epiprev.server.news.service.NewsService;
 import com.epiprev.server.news.vo.NewsVO;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/news")
+@RequiredArgsConstructor
 public class NewsController {
 
-    @Autowired
-    private NewsService newsService;
+    private final NewsService newsService;
 
     @GetMapping("/list")
-    public Result list(@RequestParam(defaultValue = "1") int page,
+    public Result<Page<NewsVO>> list(@RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
-        Page<NewsVO> result = newsService.getList(page, size);
-        return Result.success(result);
+        return Result.success(newsService.getList(page, size));
     }
 
     @GetMapping("/{id}")
-    public Result getById(@PathVariable Long id) {
+    public Result<NewsVO> getById(@PathVariable Long id) {
         return Result.success(newsService.getDetail(id));
     }
 }
-
-
-

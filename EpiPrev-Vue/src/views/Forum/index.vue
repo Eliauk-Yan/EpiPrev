@@ -22,6 +22,10 @@ const posts = ref<PostVO[]>([]);
 const hotPosts = ref<PostVO[]>([]);
 const searchKeyword = ref("");
 
+// 加载状态
+const loading = ref(false);
+const hotLoading = ref(false);
+
 // 根据关键词过滤帖子（前端过滤，也可以传word参数到后端）
 const filteredPosts = computed(() => {
   if (!searchKeyword.value.trim()) {
@@ -36,20 +40,26 @@ const filteredPosts = computed(() => {
 });
 
 const fetchPosts = async () => {
+  loading.value = true;
   try {
     const res = await getPostList();
     posts.value = res.data || [];
   } catch (error) {
     console.error("Failed to fetch posts", error);
+  } finally {
+    loading.value = false;
   }
 };
 
 const fetchHotPosts = async () => {
+  hotLoading.value = true;
   try {
     const res = await getHotPosts(5);
     hotPosts.value = res || [];
   } catch (error) {
     console.error("Failed to fetch hot posts", error);
+  } finally {
+    hotLoading.value = false;
   }
 };
 
@@ -165,7 +175,7 @@ const formatDate = (dateStr: string) => {
           </div>
 
           <!-- Post List View -->
-          <div class="post-list" v-if="!selectedPost">
+          <div class="post-list" v-if="!selectedPost" v-loading="loading">
             <div
               v-for="post in filteredPosts"
               :key="post.id"
@@ -180,7 +190,7 @@ const formatDate = (dateStr: string) => {
                 <span>💬 {{ post.replies || 0 }} 回复</span>
               </div>
             </div>
-            <el-empty v-if="filteredPosts.length === 0" :description="searchKeyword ? '未找到匹配的帖子' : '暂无帖子'" />
+            <el-empty v-if="filteredPosts.length === 0 && !loading" :description="searchKeyword ? '未找到匹配的帖子' : '暂无帖子'" />
           </div>
 
         <!-- Post Detail View -->
@@ -234,7 +244,7 @@ const formatDate = (dateStr: string) => {
       <aside class="right-sidebar">
         <div class="hot-card">
           <h3 class="card-title">🔥 热门帖子</h3>
-          <div class="hot-list">
+          <div class="hot-list" v-loading="hotLoading">
             <div 
               v-for="(post, index) in hotPosts" 
               :key="post.id" 
@@ -244,7 +254,7 @@ const formatDate = (dateStr: string) => {
               <span class="hot-index" :class="{'top-3': index < 3}">{{ index + 1 }}</span>
               <span class="hot-title">{{ post.title }}</span>
             </div>
-            <div v-if="hotPosts.length === 0" class="no-data">暂无热门数据</div>
+            <div v-if="hotPosts.length === 0 && !hotLoading" class="no-data">暂无热门数据</div>
           </div>
         </div>
       </aside>
@@ -390,6 +400,7 @@ const formatDate = (dateStr: string) => {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-height: 300px;
 }
 
 .post-card {
@@ -531,6 +542,7 @@ const formatDate = (dateStr: string) => {
 .hot-list {
     display: flex;
     flex-direction: column;
+    min-height: 150px;
 }
 
 .hot-item {

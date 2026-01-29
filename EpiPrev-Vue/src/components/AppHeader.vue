@@ -1,10 +1,24 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
 import { useRouter } from "vue-router";
-
+import { onMounted } from "vue";
+import { getUserInfo } from "@/api/user";
 
 const userStore = useUserStore();
 const router = useRouter();
+
+onMounted(async () => {
+    if (userStore.isLoggedIn) {
+        try {
+            const res = await getUserInfo();
+            if (res) {
+                userStore.setUser(res, userStore.token);
+            }
+        } catch (error) {
+            console.error("Failed to fetch user info:", error);
+        }
+    }
+});
 
 const navItems = [
   { name: "首页", path: "/" },
@@ -43,7 +57,9 @@ const handleLogout = async () => {
         <template v-if="userStore.isLoggedIn">
           <el-dropdown>
             <span class="user-info">
-              <el-avatar :size="32">{{ userStore.user?.username?.charAt(0) }}</el-avatar>
+              <el-avatar :size="32" :src="userStore.user?.avatar">
+                {{ userStore.user?.username?.charAt(0).toUpperCase() }}
+              </el-avatar>
               <span class="username">{{ userStore.user?.username }}</span>
             </span>
             <template #dropdown>

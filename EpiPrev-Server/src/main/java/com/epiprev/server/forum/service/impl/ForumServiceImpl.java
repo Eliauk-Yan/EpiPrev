@@ -1,5 +1,8 @@
 package com.epiprev.server.forum.service.impl;
 
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.Cached;
+
 import cn.dev33.satoken.stp.StpUtil;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -22,6 +25,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.concurrent.TimeUnit;
 import java.util.List;
 
 import static com.epiprev.server.forum.exception.ForumErrorCode.COMMENT_CREATE_FAILED;
@@ -39,6 +43,7 @@ public class ForumServiceImpl extends ServiceImpl<ForumPostMapper, ForumPost> im
     private final ForumConvert forumConvert;
 
     @Override
+    @Cached(name = "forum:list:", key = "#dto.current + '-' + #dto.size + '-' + #dto.word", expire = 60, timeUnit = TimeUnit.SECONDS, cacheType = CacheType.BOTH)
     public Page<PostVO> getList(PostListDTO dto) {
         // 1. 构造帖子分页
         Page<ForumPost> page = new Page<>(dto.getCurrent(), dto.getSize());
@@ -63,6 +68,7 @@ public class ForumServiceImpl extends ServiceImpl<ForumPostMapper, ForumPost> im
     }
 
     @Override
+    @Cached(name = "forum:hot:", key = "#limit", expire = 300, timeUnit = TimeUnit.SECONDS, cacheType = CacheType.BOTH)
     public List<PostVO> getHotList(int limit) {
         // 1. 查询热门帖子
         List<ForumPost> posts = list(

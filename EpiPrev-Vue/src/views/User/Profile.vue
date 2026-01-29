@@ -1,10 +1,70 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
+import { ref, onMounted } from "vue";
+import { getUserInfo, updateUserInfo, type UserUpdateData } from "@/api/user";
+import { ElMessage, ElMessageBox } from "element-plus";
+import { useRouter } from "vue-router";
 
 const userStore = useUserStore();
+const router = useRouter();
+const editDialogVisible = ref(false);
 
-// You might want to fetch fresh user data here if needed, 
-// but for now we'll use what's in the store.
+const handleLogout = () => {
+    ElMessageBox.confirm('确定要退出登录吗?', '提示', {
+        type: 'warning'
+    }).then(async () => {
+        await userStore.logout();
+        router.push('/login');
+        ElMessage.success('已退出登录');
+    });
+};
+const editForm = ref<UserUpdateData>({});
+const updating = ref(false);
+
+const initEdit = () => {
+  editForm.value = {
+    username: userStore.user?.username,
+    email: userStore.user?.email,
+    phone: userStore.user?.phone,
+    avatar: userStore.user?.avatar
+  };
+  editDialogVisible.value = true;
+};
+
+const handleUpdate = async () => {
+  updating.value = true;
+  try {
+    await updateUserInfo(editForm.value);
+    ElMessage.success("修改成功");
+    editDialogVisible.value = false;
+    // Refresh
+    const res = await getUserInfo();
+    if (res) {
+      userStore.setUser(res, userStore.token);
+    }
+  } catch (error) {
+    // handled
+  } finally {
+    updating.value = false;
+  }
+};
+
+const formatDate = (val: string | undefined) => {
+    if (!val) return '2024-01-01';
+    const date = new Date(val);
+    return date.toLocaleDateString();
+};
+
+onMounted(async () => {
+    try {
+        const res = await getUserInfo();
+        if (res) {
+            userStore.setUser(res, userStore.token);
+        }
+    } catch(e) {
+        console.error(e);
+    }
+});
 </script>
 
 <template>
@@ -15,19 +75,21 @@ const userStore = useUserStore();
       <div class="profile-card glass-effect">
         <div class="card-header">
           <h2>个人中心</h2>
-          <span class="edit-btn">编辑资料</span>
+          <span class="edit-btn" @click="initEdit">编辑资料</span>
         </div>
         
         <div class="profile-content">
-          <div class="left-section">
+          <div class="profile-header-section">
             <div class="avatar-wrapper">
-              <el-avatar :size="120" :src="userStore.user?.avatar" class="user-avatar">
+              <el-avatar :size="100" :src="userStore.user?.avatar" class="user-avatar">
                 {{ userStore.user?.username?.charAt(0).toUpperCase() }}
               </el-avatar>
               <div class="user-status-badge"></div>
             </div>
-            <h3 class="username">{{ userStore.user?.username }}</h3>
-            <p class="user-role">普通用户</p>
+            <div class="header-info">
+              <h3 class="username">{{ userStore.user?.username }}</h3>
+              <p class="user-role">普通用户</p>
+            </div>
           </div>
           
           <div class="right-section">
@@ -40,10 +102,15 @@ const userStore = useUserStore();
               <label>电子邮箱</label>
               <div class="info-value">{{ userStore.user?.email || '未绑定' }}</div>
             </div>
+
+            <div class="info-group">
+              <label>手机号码</label>
+              <div class="info-value">{{ userStore.user?.phone || '未绑定' }}</div>
+            </div>
             
             <div class="info-group">
               <label>注册时间</label>
-              <div class="info-value">2024-01-01</div> <!-- Placeholder for now -->
+              <div class="info-value">{{ formatDate(userStore.user?.createTime) }}</div>
             </div>
              
              <div class="info-group full-width">
@@ -52,8 +119,36 @@ const userStore = useUserStore();
              </div>
           </div>
         </div>
+
+        <div class="card-footer">
+          <el-button type="danger" plain class="logout-btn" @click="handleLogout">退出登录</el-button>
+        </div>
       </div>
     </div>
+
+    <!-- Edit Dialog -->
+    <el-dialog v-model="editDialogVisible" title="编辑个人资料" width="500px" custom-class="glass-dialog">
+      <el-form :model="editForm" label-width="80px" class="edit-form">
+        <el-form-item label="头像链接">
+            <el-input v-model="editForm.avatar" placeholder="输入图片URL" />
+        </el-form-item>
+        <el-form-item label="用户名">
+            <el-input v-model="editForm.username" />
+        </el-form-item>
+        <el-form-item label="手机号">
+            <el-input v-model="editForm.phone" />
+        </el-form-item>
+        <el-form-item label="邮箱">
+            <el-input v-model="editForm.email" />
+        </el-form-item>
+      </el-form>
+      <template #footer>
+        <div class="dialog-footer">
+            <el-button @click="editDialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="handleUpdate" :loading="updating">保存修改</el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -151,15 +246,27 @@ const userStore = useUserStore();
 
 .profile-content {
   display: flex;
-  gap: 60px;
+  flex-direction: column;
+  gap: 40px;
+}
+
+.profile-header-section {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+  padding-bottom: 30px;
+  border-bottom: 1px solid rgba(0,0,0,0.05);
+}
+
+.header-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
 
 .left-section {
-  flex: 0 0 240px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  text-align: center;
+  /* Keep for backward compatibility or remove if unused */
+  display: none; 
 }
 
 .avatar-wrapper {
@@ -259,5 +366,44 @@ const userStore = useUserStore();
   .right-section {
     grid-template-columns: 1fr;
   }
+}
+
+:deep(.glass-dialog) {
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-radius: 16px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+}
+
+:deep(.glass-dialog .el-dialog__title) {
+  color: var(--text-main);
+  font-weight: 600;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.card-footer {
+  margin-top: 40px;
+  display: flex;
+  justify-content: center;
+  padding-top: 20px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.logout-btn {
+  width: 100%;
+  max-width: 200px;
+  border-radius: 12px;
+  padding: 12px;
+}
+
+.avatar-wrapper {
+  position: relative;
 }
 </style>

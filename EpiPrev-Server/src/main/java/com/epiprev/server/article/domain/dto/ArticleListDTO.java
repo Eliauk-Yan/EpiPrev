@@ -10,9 +10,9 @@ import lombok.Data;
 @Data
 public class ArticleListDTO {
 
-    private Long size = 10L;
+    private long size = 10L;
 
-    private Long current = 1L;
+    private long current = 1L;
 
     private String word;
 

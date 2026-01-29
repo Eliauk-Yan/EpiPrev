@@ -25,16 +25,20 @@ export const useUserStore = defineStore(
             token.value = userToken;
         }
 
+        const clearUserInfo = () => {
+            user.value = null;
+            token.value = "";
+        };
+
         const logout = async () => {
             try {
                 await logoutApi();
             } finally {
-                user.value = null;
-                token.value = "";
+                clearUserInfo();
             }
         };
 
-        return { user, token, isLoggedIn, login, logout, setUser };
+        return { user, token, isLoggedIn, login, logout, setUser, clearUserInfo };
     },
     { persist: true }
 );

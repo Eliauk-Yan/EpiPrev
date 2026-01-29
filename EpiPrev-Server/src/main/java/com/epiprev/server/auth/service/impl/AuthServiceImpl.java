@@ -51,6 +51,7 @@ public class AuthServiceImpl implements AuthService {
         // 5. 组装登录信息
         LoginVO loginVO = new LoginVO();
         loginVO.setToken(StpUtil.getTokenValue());
+        loginVO.setUserInfo(sysUserConvert.sysUserToUserInfoDTO(user));
         // 6. 返回登录信息
         return loginVO;
     }

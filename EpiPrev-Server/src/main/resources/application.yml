@@ -7,3 +7,4 @@ spring:
     import:
       - classpath:/datasource.yml # 数据源配置
       - classpath:/cache.yml # 缓存配置
+      - classpath:/ai.yml # 大模型配置

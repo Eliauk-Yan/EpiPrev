@@ -1,5 +1,8 @@
 package com.epiprev.server.article.service.impl;
 
+import com.alicp.jetcache.anno.CacheType;
+import com.alicp.jetcache.anno.Cached;
+
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
@@ -15,6 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
+import java.util.concurrent.TimeUnit;
+
 import static com.epiprev.server.article.exception.ArticleErrorCode.ARTICLE_NOT_FOUND;
 
 @Service
@@ -26,6 +31,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     private final ArticleConvert articleConvert;
 
     @Override
+    @Cached(name = "article:list:", key = "#dto.current + '-' + #dto.size + '-' + #dto.word + '-' + #dto.type", expire = 3600, timeUnit = TimeUnit.SECONDS, cacheType = CacheType.BOTH)
     public Page<ArticleVO> getList(ArticleListDTO dto) {
         // 1. 获取分页对象
         Page<Article> articlePage = new Page<>(dto.getCurrent(), dto.getSize());
@@ -47,6 +53,7 @@ public class ArticleServiceImpl extends ServiceImpl<ArticleMapper, Article> impl
     }
 
     @Override
+    @Cached(name = "article:detail:", key = "#id", expire = 3600, timeUnit = TimeUnit.SECONDS, cacheType = CacheType.BOTH)
     public ArticleVO getDetail(Long id) {
         Article article = getById(id);
         if (article == null) {

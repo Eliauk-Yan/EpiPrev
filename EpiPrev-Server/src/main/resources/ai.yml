@@ -1,0 +1,16 @@
+# 大模型对话中文乱码UTF8处理
+server:
+  servlet:
+    encoding:
+      enabled: true
+      force: true
+      charset: UTF-8
+spring:
+  ai:
+    dashscope:
+      api-key: sk-57f2c05e0d85465699da03f41c5020a2 # TODO 暂时明文处理
+      # base-url: https://dashscope.aliyuncs.com/compatible-mode/v1 # base-url (Use default for native client)
+      chat:
+        options:
+          model: qwen-plus # 使用模型
+

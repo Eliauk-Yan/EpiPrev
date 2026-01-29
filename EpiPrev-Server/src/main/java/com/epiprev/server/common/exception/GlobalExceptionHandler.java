@@ -52,26 +52,14 @@ public class GlobalExceptionHandler {
     @ResponseBody
     public Result<Void> handleNotLoginException(NotLoginException e) {
         log.warn("未登录异常：{}", e.getMessage());
-        String message;
-        switch (e.getType()) {
-            case NotLoginException.NOT_TOKEN:
-                message = "未提供Token";
-                break;
-            case NotLoginException.INVALID_TOKEN:
-                message = "Token无效";
-                break;
-            case NotLoginException.TOKEN_TIMEOUT:
-                message = "登录已过期，请重新登录";
-                break;
-            case NotLoginException.BE_REPLACED:
-                message = "账号已在其他地方登录";
-                break;
-            case NotLoginException.KICK_OUT:
-                message = "账号已被踢下线";
-                break;
-            default:
-                message = "请先登录";
-        }
+        String message = switch (e.getType()) {
+            case NotLoginException.NOT_TOKEN -> "未提供Token";
+            case NotLoginException.INVALID_TOKEN -> "Token无效";
+            case NotLoginException.TOKEN_TIMEOUT -> "登录已过期，请重新登录";
+            case NotLoginException.BE_REPLACED -> "账号已在其他地方登录";
+            case NotLoginException.KICK_OUT -> "账号已被踢下线";
+            default -> "请先登录";
+        };
         return Result.error(ResultCode.UNAUTHORIZED.getCode(), message);
     }
 

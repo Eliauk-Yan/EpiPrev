@@ -59,9 +59,12 @@ instance.interceptors.response.use(
             // 未登录或Token过期，跳转登录页
             if (errorCode === "401") {
                 const store = useUserStore();
-                store.logout();
+                store.clearUserInfo();
                 showError(errorMessage);
-                router.push("/login");
+                // 如果不是在登录页，则跳转到登录页
+                if (router.currentRoute.value.path !== "/login") {
+                    router.push("/login");
+                }
             } else {
                 // 其他业务错误，弹窗提示
                 showError(errorMessage);
@@ -81,8 +84,10 @@ instance.interceptors.response.use(
                 // 检查是否需要跳转登录页
                 if (resData.code === "401") {
                     const store = useUserStore();
-                    store.logout();
-                    router.push("/login");
+                    store.clearUserInfo();
+                    if (router.currentRoute.value.path !== "/login") {
+                        router.push("/login");
+                    }
                 }
             } else {
                 // 根据状态码设置默认消息
@@ -90,8 +95,10 @@ instance.interceptors.response.use(
                     case 401:
                         message = "未授权，请重新登录";
                         const store = useUserStore();
-                        store.logout();
-                        router.push("/login");
+                        store.clearUserInfo();
+                        if (router.currentRoute.value.path !== "/login") {
+                            router.push("/login");
+                        }
                         break;
                     case 403:
                         message = "拒绝访问";

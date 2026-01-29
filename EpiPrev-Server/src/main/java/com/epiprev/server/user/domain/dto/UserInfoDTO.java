@@ -1,6 +1,7 @@
 package com.epiprev.server.user.domain.dto;
 
 import lombok.Data;
+import java.time.LocalDateTime;
 
 /**
  * @classname UserInfoDTO
@@ -17,5 +18,9 @@ public class UserInfoDTO {
     private String email;
 
     private String avatar;
+
+    private String phone;
+
+    private LocalDateTime createTime;
 
 }
