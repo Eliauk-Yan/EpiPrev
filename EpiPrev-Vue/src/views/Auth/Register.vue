@@ -11,7 +11,7 @@ const formRef = ref<FormInstance>();
 const loading = ref(false);
 
 const form = reactive({
-  username: "",
+  nickName: "",
   email: "",
   password: "",
   confirmPassword: "",
@@ -26,7 +26,7 @@ const validatePass = (_rule: unknown, value: string, callback: (error?: Error) =
 };
 
 const rules: FormRules = {
-  username: [
+  nickName: [
     { required: true, message: "请输入用户名", trigger: "blur" },
     { min: 3, max: 20, message: "用户名长度为3-20个字符", trigger: "blur" },
   ],
@@ -51,14 +51,14 @@ const handleSubmit = async (formEl: FormInstance | undefined) => {
       loading.value = true;
       try {
         await register({
-            username: form.username,
+            nickName: form.nickName,
             password: form.password,
             email: form.email
         });
         ElMessage.success("注册成功，请登录");
         await router.push({
           path: "/login",
-          query: {username: form.username},
+          query: {nickName: form.nickName},
         });
       } catch (error) {
         // Error handled
@@ -85,10 +85,10 @@ const handleSubmit = async (formEl: FormInstance | undefined) => {
       <div class="form-wrapper">
         <h2 class="title">创建账号</h2>
         <p class="subtitle">填写以下信息完成注册</p>
-        
+
         <el-form ref="formRef" :model="form" :rules="rules" label-position="top" size="large">
-          <el-form-item label="用户名" prop="username">
-            <el-input v-model="form.username" placeholder="请输入用户名" />
+          <el-form-item label="用户名" prop="nickName">
+            <el-input v-model="form.nickName" placeholder="请输入用户名" />
           </el-form-item>
           <el-form-item label="邮箱" prop="email">
             <el-input v-model="form.email" placeholder="请输入邮箱" />
@@ -99,14 +99,14 @@ const handleSubmit = async (formEl: FormInstance | undefined) => {
           <el-form-item label="确认密码" prop="confirmPassword">
             <el-input v-model="form.confirmPassword" type="password" placeholder="请再次输入密码" show-password />
           </el-form-item>
-          
+
           <el-form-item>
             <el-button type="primary" :loading="loading" class="submit-btn" @click="handleSubmit(formRef)">
               立即注册
             </el-button>
           </el-form-item>
         </el-form>
-        
+
         <div class="form-footer">
           <span class="text-gray">已有账号？</span>
           <RouterLink to="/login" class="link">立即登录</RouterLink>
@@ -183,7 +183,7 @@ const handleSubmit = async (formEl: FormInstance | undefined) => {
   border: 1px solid rgba(255, 255, 255, 0.8);
   box-shadow: 0 8px 32px rgba(31, 38, 135, 0.07);
   border-radius: 24px;
-  
+
   padding: 40px; /* Increased padding */
   position: relative;
   z-index: 2;

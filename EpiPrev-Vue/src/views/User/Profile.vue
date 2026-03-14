@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
-import { ref, onMounted } from "vue";
-import { getUserInfo, updateUserInfo, type UserUpdateData } from "@/api/user";
+import { ref, onMounted, watch } from "vue";
+import { getUserInfo, updateAvatar, updateNickName } from "@/api/user";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
+import { Camera } from "@element-plus/icons-vue";
 
 const userStore = useUserStore();
 const router = useRouter();
-const editDialogVisible = ref(false);
 
 const handleLogout = () => {
     ElMessageBox.confirm('确定要退出登录吗?', '提示', {
@@ -18,41 +18,80 @@ const handleLogout = () => {
         ElMessage.success('已退出登录');
     });
 };
-const editForm = ref<UserUpdateData>({});
-const updating = ref(false);
 
-const initEdit = () => {
-  editForm.value = {
-    username: userStore.user?.username,
-    email: userStore.user?.email,
-    phone: userStore.user?.phone,
-    avatar: userStore.user?.avatar
-  };
-  editDialogVisible.value = true;
-};
+const nicknameInput = ref(userStore.user?.nickName || "");
+const nickNameUpdating = ref(false);
+const avatarUpdating = ref(false);
 
-const handleUpdate = async () => {
-  updating.value = true;
+watch(() => userStore.user?.nickName, (newVal) => {
+  if (newVal) nicknameInput.value = newVal;
+});
+
+const handleUpdateNickName = async () => {
+  if (!nicknameInput.value || nicknameInput.value === userStore.user?.nickName) return;
+  nickNameUpdating.value = true;
   try {
-    await updateUserInfo(editForm.value);
-    ElMessage.success("修改成功");
-    editDialogVisible.value = false;
-    // Refresh
+    await updateNickName(nicknameInput.value);
+    ElMessage.success("昵称修改成功");
     const res = await getUserInfo();
     if (res) {
       userStore.setUser(res, userStore.token);
     }
-  } catch (error) {
-    // handled
   } finally {
-    updating.value = false;
+    nickNameUpdating.value = false;
   }
 };
 
+const handleAvatarClick = () => {
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+  input.onchange = async (e: any) => {
+    const file = e.target.files[0];
+    if (file) {
+      if (file.size > 2 * 1024 * 1024) {
+        ElMessage.error("头像大小不能超过 2MB");
+        return;
+      }
+      avatarUpdating.value = true;
+      try {
+        await updateAvatar(file);
+        ElMessage.success("头像上传成功");
+        const res = await getUserInfo();
+        if (res) {
+          userStore.setUser(res, userStore.token);
+        }
+      } catch (err) {
+        console.error(err);
+      } finally {
+        avatarUpdating.value = false;
+      }
+    }
+  };
+  input.click();
+};
+
 const formatDate = (val: string | undefined) => {
-    if (!val) return '2024-01-01';
+    if (!val) return '尚未记录';
     const date = new Date(val);
-    return date.toLocaleDateString();
+    return date.toLocaleString();
+};
+
+const getRoleLabel = (role: string | undefined) => {
+  const roles: Record<string, string> = {
+    'ADMIN': '管理员',
+    'USER': '普通用户'
+  };
+  return role ? (roles[role] || role) : '未知角色';
+};
+
+const getStateLabel = (state: string | undefined) => {
+  const states: Record<string, string> = {
+    'INIT': '正常',
+    'AUTH': '已认证',
+    'FROZEN': '已冻结'
+  };
+  return state ? (states[state] || state) : '未知状态';
 };
 
 onMounted(async () => {
@@ -70,50 +109,81 @@ onMounted(async () => {
 <template>
   <div class="profile-page">
     <div class="profile-bg"></div>
-    
+
     <div class="profile-container">
       <div class="profile-card glass-effect">
         <div class="card-header">
           <h2>个人中心</h2>
-          <span class="edit-btn" @click="initEdit">编辑资料</span>
         </div>
-        
+
         <div class="profile-content">
           <div class="profile-header-section">
-            <div class="avatar-wrapper">
+            <div class="avatar-wrapper clickable" @click="handleAvatarClick" v-loading="avatarUpdating">
               <el-avatar :size="100" :src="userStore.user?.avatar" class="user-avatar">
-                {{ userStore.user?.username?.charAt(0).toUpperCase() }}
+                {{ userStore.user?.nickName?.charAt(0).toUpperCase() }}
               </el-avatar>
-              <div class="user-status-badge"></div>
+              <div class="avatar-hover-mask">
+                <el-icon><Camera /></el-icon>
+                <span>更换头像</span>
+              </div>
+              <div class="user-status-badge" :class="userStore.user?.state?.toLowerCase()"></div>
             </div>
             <div class="header-info">
-              <h3 class="username">{{ userStore.user?.username }}</h3>
-              <p class="user-role">普通用户</p>
+              <h3 class="username">{{ userStore.user?.nickName }}</h3>
+              <div class="tag-group">
+                <el-tag size="small" :type="userStore.user?.role === 'ADMIN' ? 'danger' : 'success'">
+                  {{ getRoleLabel(userStore.user?.role) }}
+                </el-tag>
+                <el-tag size="small" :type="userStore.user?.certification ? 'primary' : 'info'" effect="plain">
+                  {{ userStore.user?.certification ? '已实名' : '未实名' }}
+                </el-tag>
+              </div>
             </div>
           </div>
-          
+
           <div class="right-section">
-            <div class="info-group">
-              <label>用户名</label>
-              <div class="info-value">{{ userStore.user?.username }}</div>
-            </div>
-            
-            <div class="info-group">
-              <label>电子邮箱</label>
-              <div class="info-value">{{ userStore.user?.email || '未绑定' }}</div>
+            <div class="info-group full-width">
+              <label>个人昵称</label>
+              <div class="nickname-edit-wrapper">
+                <el-input 
+                  v-model="nicknameInput" 
+                  placeholder="请输入新昵称"
+                  class="nickname-input"
+                >
+                  <template #append>
+                    <el-button 
+                      type="primary" 
+                      @click="handleUpdateNickName" 
+                      :loading="nickNameUpdating"
+                      :disabled="!nicknameInput || nicknameInput === userStore.user?.nickName"
+                    >
+                      修改
+                    </el-button>
+                  </template>
+                </el-input>
+              </div>
             </div>
 
             <div class="info-group">
               <label>手机号码</label>
-              <div class="info-value">{{ userStore.user?.phone || '未绑定' }}</div>
+              <div class="info-value">{{ userStore.user?.telephone || '未绑定' }}</div>
             </div>
-            
+
+            <div class="info-group">
+              <label>用户状态</label>
+              <div class="info-value">
+                <el-tag :type="userStore.user?.state === 'FROZEN' ? 'danger' : 'success'" size="small">
+                  {{ getStateLabel(userStore.user?.state) }}
+                </el-tag>
+              </div>
+            </div>
+
             <div class="info-group">
               <label>注册时间</label>
               <div class="info-value">{{ formatDate(userStore.user?.createTime) }}</div>
             </div>
-             
-             <div class="info-group full-width">
+
+             <div class="info-group">
                <label>用户ID</label>
                <div class="info-value mono">{{ userStore.user?.id }}</div>
              </div>
@@ -125,30 +195,6 @@ onMounted(async () => {
         </div>
       </div>
     </div>
-
-    <!-- Edit Dialog -->
-    <el-dialog v-model="editDialogVisible" title="编辑个人资料" width="500px" custom-class="glass-dialog">
-      <el-form :model="editForm" label-width="80px" class="edit-form">
-        <el-form-item label="头像链接">
-            <el-input v-model="editForm.avatar" placeholder="输入图片URL" />
-        </el-form-item>
-        <el-form-item label="用户名">
-            <el-input v-model="editForm.username" />
-        </el-form-item>
-        <el-form-item label="手机号">
-            <el-input v-model="editForm.phone" />
-        </el-form-item>
-        <el-form-item label="邮箱">
-            <el-input v-model="editForm.email" />
-        </el-form-item>
-      </el-form>
-      <template #footer>
-        <div class="dialog-footer">
-            <el-button @click="editDialogVisible = false">取消</el-button>
-            <el-button type="primary" @click="handleUpdate" :loading="updating">保存修改</el-button>
-        </div>
-      </template>
-    </el-dialog>
   </div>
 </template>
 
@@ -229,21 +275,6 @@ onMounted(async () => {
   margin: 0;
 }
 
-.edit-btn {
-  font-size: 14px;
-  color: var(--primary-color);
-  cursor: pointer;
-  padding: 8px 16px;
-  border-radius: 20px;
-  background: rgba(64, 158, 255, 0.1);
-  transition: all 0.3s;
-}
-
-.edit-btn:hover {
-  background: var(--primary-color);
-  color: white;
-}
-
 .profile-content {
   display: flex;
   flex-direction: column;
@@ -264,24 +295,43 @@ onMounted(async () => {
   gap: 8px;
 }
 
-.left-section {
-  /* Keep for backward compatibility or remove if unused */
-  display: none; 
+.tag-group {
+  display: flex;
+  gap: 8px;
 }
 
 .avatar-wrapper {
   position: relative;
-  margin-bottom: 20px;
+  cursor: pointer;
+}
+
+.avatar-hover-mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  opacity: 0;
+  transition: opacity 0.3s;
+  font-size: 12px;
+  gap: 4px;
+}
+
+.avatar-wrapper:hover .avatar-hover-mask {
+  opacity: 1;
 }
 
 .user-avatar {
   border: 4px solid white;
   box-shadow: 0 8px 24px rgba(64, 158, 255, 0.25);
   transition: transform 0.3s ease;
-}
-
-.user-avatar:hover {
-  transform: scale(1.05);
 }
 
 .username {
@@ -291,12 +341,31 @@ onMounted(async () => {
   color: var(--text-main);
 }
 
-.user-role {
-  color: var(--text-secondary);
-  font-size: 14px;
-  background: rgba(0,0,0,0.05);
-  padding: 4px 12px;
-  border-radius: 12px;
+.user-status-badge {
+  position: absolute;
+  bottom: 5px;
+  right: 5px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 3px solid white;
+  background: #909399;
+  z-index: 2;
+}
+
+.user-status-badge.init {
+  background: #67C23A;
+  box-shadow: 0 0 10px rgba(103, 194, 58, 0.5);
+}
+
+.user-status-badge.auth {
+  background: #409EFF;
+  box-shadow: 0 0 10px rgba(64, 158, 255, 0.5);
+}
+
+.user-status-badge.frozen {
+  background: #F56C6C;
+  box-shadow: 0 0 10px rgba(245, 108, 108, 0.5);
 }
 
 .right-section {
@@ -335,6 +404,23 @@ onMounted(async () => {
   transition: all 0.3s;
 }
 
+.nickname-edit-wrapper {
+  max-width: 400px;
+}
+
+:deep(.nickname-input .el-input-group__append) {
+  background-color: var(--el-color-primary);
+  color: white;
+  border-color: var(--el-color-primary);
+  padding: 0;
+}
+
+:deep(.nickname-input .el-input-group__append button) {
+  margin: 0;
+  padding: 0 20px;
+  height: 100%;
+}
+
 .info-value:hover {
   background: white;
   box-shadow: 0 4px 12px rgba(0,0,0,0.03);
@@ -362,30 +448,10 @@ onMounted(async () => {
     flex-direction: column;
     gap: 30px;
   }
-  
+
   .right-section {
     grid-template-columns: 1fr;
   }
-}
-
-:deep(.glass-dialog) {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(20px);
-  -webkit-backdrop-filter: blur(20px);
-  border-radius: 16px;
-  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-}
-
-:deep(.glass-dialog .el-dialog__title) {
-  color: var(--text-main);
-  font-weight: 600;
-}
-
-.dialog-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
 }
 
 .card-footer {
@@ -401,9 +467,5 @@ onMounted(async () => {
   max-width: 200px;
   border-radius: 12px;
   padding: 12px;
-}
-
-.avatar-wrapper {
-  position: relative;
 }
 </style>

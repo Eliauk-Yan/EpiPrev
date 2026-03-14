@@ -1,8 +1,8 @@
-package com.nexo.common.file.service.impl;
+package com.epiprev.common.file.service.impl;
 
-import com.nexo.common.file.config.FileProperties;
-import com.nexo.common.file.domain.exception.FileException;
-import com.nexo.common.file.service.FileService;
+import com.epiprev.common.file.config.FileProperties;
+import com.epiprev.common.file.exception.FileException;
+import com.epiprev.common.file.service.FileService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,13 +18,13 @@ import software.amazon.awssdk.services.s3.presigner.model.GetObjectPresignReques
 import java.io.IOException;
 import java.time.Duration;
 
-import static com.nexo.common.file.constant.FileConstant.SEPARATOR;
-import static com.nexo.common.file.domain.exception.FileErrorCode.*;
+import static com.epiprev.common.file.constant.FileConstant.SEPARATOR;
+import static com.epiprev.common.file.exception.FileErrorCode.*;
+
 
 /**
  * @classname FileServiceImpl
  * @description RustFS (S3 兼容) 文件存储服务实现类
- * @date 2024/01/30
  */
 @Slf4j
 @RequiredArgsConstructor

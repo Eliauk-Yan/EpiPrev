@@ -58,9 +58,9 @@ const handleLogout = async () => {
           <el-dropdown>
             <span class="user-info">
               <el-avatar :size="32" :src="userStore.user?.avatar">
-                {{ userStore.user?.username?.charAt(0).toUpperCase() }}
+                {{ userStore.user?.nickName?.charAt(0).toUpperCase() }}
               </el-avatar>
-              <span class="username">{{ userStore.user?.username }}</span>
+              <span class="username">{{ userStore.user?.nickName }}</span>
             </span>
             <template #dropdown>
               <el-dropdown-menu>

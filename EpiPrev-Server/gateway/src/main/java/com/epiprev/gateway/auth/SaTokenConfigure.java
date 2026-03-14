@@ -1,4 +1,4 @@
-package com.nexo.gateway.auth;
+package com.epiprev.gateway.auth;
 
 import cn.dev33.satoken.exception.NotLoginException;
 import cn.dev33.satoken.exception.NotPermissionException;
@@ -7,18 +7,13 @@ import cn.dev33.satoken.reactor.filter.SaReactorFilter;
 import cn.dev33.satoken.router.SaRouter;
 import cn.dev33.satoken.stp.StpUtil;
 import cn.dev33.satoken.util.SaResult;
-import com.nexo.common.api.user.constant.UserPermission;
-import com.nexo.common.api.user.constant.UserRole;
+
+import com.epiprev.common.api.user.constant.UserPermission;
+import com.epiprev.common.api.user.constant.UserRole;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-/**
- * @classname SaTokenConfigure
- * @description SaToken配置类
- * @date 2025/12/08 19:55
- * @created by YanShijie
- */
 @Configuration
 @Slf4j
 public class SaTokenConfigure {
@@ -36,9 +31,7 @@ public class SaTokenConfigure {
                     // 登录校验
                     SaRouter.match("/**",  _ -> StpUtil.checkLogin());
                     // 管理端模块 -> 用户角色校验
-                    SaRouter.match("/admin/**", r -> StpUtil.checkRoleOr(UserRole.ADMIN.getCode(), UserRole.ROOT.getCode(), UserRole.GOD.getCode()));
-                    // 交易模块 -> 认证权限校验（未认证的用户无法下单）
-                    SaRouter.match("/trade/**", r -> StpUtil.checkPermission(UserPermission.AUTHENTICATE.getCode()));
+                    SaRouter.match("/admin/**", r -> StpUtil.checkRoleOr(UserRole.ADMIN.getCode()));
                 })
                 // 异常处理方法：每次setAuth函数出现异常时进入
                 .setError(this::getSaResult);
@@ -51,7 +44,7 @@ public class SaTokenConfigure {
                 yield SaResult.error("未登录");
             }
             case NotRoleException e -> {
-                if (!UserRole.ADMIN.getCode().equals(e.getRole()) && !UserRole.ROOT.getCode().equals(e.getRole()) && !UserRole.GOD.getCode().equals(e.getRole())) {
+                if (!UserRole.ADMIN.getCode().equals(e.getRole())) {
                     log.error("请勿越权使用");
                     yield SaResult.error("请勿越权使用");
                 }

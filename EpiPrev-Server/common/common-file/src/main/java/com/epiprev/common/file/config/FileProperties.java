@@ -1,4 +1,4 @@
-package com.nexo.common.file.config;
+package com.epiprev.common.file.config;
 
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
@@ -6,8 +6,6 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 /**
  * @classname FileProperties
  * @description 文件存储配置属性类
- * @date 2025/12/12 10:46
- * @created by YanShijie
  */
 @Data
 @ConfigurationProperties(prefix = "rustfs")
@@ -36,6 +34,6 @@ public class FileProperties {
     /**
      * 桶名称
      */
-    private String bucketName = "nexo";
+    private String bucketName = "epiprev";
 
 }

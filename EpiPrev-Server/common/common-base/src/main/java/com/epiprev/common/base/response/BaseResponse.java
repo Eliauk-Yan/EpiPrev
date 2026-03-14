@@ -1,4 +1,4 @@
-package com.nexo.common.api.common.response;
+package com.epiprev.common.base.response;
 
 import lombok.Data;
 
@@ -8,8 +8,6 @@ import java.io.Serializable;
 /**
  * @classname BaseResponse
  * @description 响应基类
- * @date 2025/11/30 13:13
- * @created by YanShijie
  */
 @Data
 public class BaseResponse implements Serializable {

@@ -7,9 +7,7 @@ import com.alibaba.dashscope.exception.NoApiKeyException;
 import com.epiprev.common.ai.config.AIProperties;
 import com.epiprev.common.ai.service.AIService;
 import lombok.AllArgsConstructor;
-import org.springframework.stereotype.Service;
 
-@Service
 @AllArgsConstructor
 public class AIServiceImpl implements AIService {
 

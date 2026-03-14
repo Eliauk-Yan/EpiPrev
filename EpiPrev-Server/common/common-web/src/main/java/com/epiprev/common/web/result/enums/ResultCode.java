@@ -1,4 +1,4 @@
-package com.nexo.common.web.result.enums;
+package com.epiprev.common.web.result.enums;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -6,8 +6,6 @@ import lombok.Getter;
 /**
  * @classname ResultCode
  * @description 业务状态码枚举
- * @date 2025/11/28
- * @created by YanShijie
  */
 @AllArgsConstructor
 @Getter

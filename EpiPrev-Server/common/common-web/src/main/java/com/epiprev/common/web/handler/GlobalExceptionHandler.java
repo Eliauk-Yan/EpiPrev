@@ -1,21 +1,21 @@
-package com.nexo.common.web.handler;
+package com.epiprev.common.web.handler;
 
-import com.nexo.common.base.exception.BusinessException;
-import com.nexo.common.base.exception.SystemException;
-import com.nexo.common.web.result.enums.ResultCode;
-import com.nexo.common.web.result.Result;
+import com.epiprev.common.base.exception.BusinessException;
+import com.epiprev.common.base.exception.SystemException;
+import com.epiprev.common.web.result.Result;
+import com.epiprev.common.web.result.enums.ResultCode;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.server.ServerWebExchange;
+import reactor.core.publisher.Mono;
 
 /**
  * @classname GlobalExceptionHandler
  * @description 全局异常处理
- * @date 2025/12/01 09:49
- * @created by YanShijie
  */
 @ControllerAdvice
 @Slf4j
@@ -46,6 +46,7 @@ public class GlobalExceptionHandler {
         if (e.getErrorCode() != null) {
             return Result.error(e.getErrorCode().getCode(), e.getMessage());
         }
-        return Result.error(ResultCode.INTERNAL_SERVER_ERROR);
+        return Result.error(ResultCode.INTERNAL_SERVER_ERROR.getCode(), e.getMessage());
     }
+
 }

@@ -1,20 +1,14 @@
-package com.nexo.common.web.result;
+package com.epiprev.common.web.result;
 
-import com.nexo.common.web.result.enums.ResultCode;
-
-import java.util.List;
+import com.epiprev.common.web.result.enums.ResultCode;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 
+import java.util.List;
+
 /**
- * 为什么不直接Result<Page<T>>而是要在写一个统一返回对象呢？
- * 1. Result<Page<T>>破环了分层规则，接口层不应该暴露持久化层
- * 2. 前端只关心 records / total / page / size，不可控。
- * ...分层解耦，接口稳定，ORM替换成本，前端友好，语义清晰，测试Mock方便
- * 
  * @classname MultiResult
  * @description 多结果统一返回类型
- * @date 2025/12/21 15:12
  */
 @Data
 @EqualsAndHashCode(callSuper = true)

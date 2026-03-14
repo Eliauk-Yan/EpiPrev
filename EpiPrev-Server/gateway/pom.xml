@@ -18,4 +18,66 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <!-- Spring Cloud Gateway -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-gateway-server-webflux </artifactId>
+        </dependency>
+        <!--公共接口模块-->
+        <dependency>
+            <groupId>com.epiprev.common.api</groupId>
+            <artifactId>common-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!--公共配置模块-->
+        <dependency>
+            <groupId>com.epiprev.common.config</groupId>
+            <artifactId>common-config</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!-- 公共缓存模块 -->
+        <dependency>
+            <groupId>com.epiprev.common.cache</groupId>
+            <artifactId>common-cache</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!-- Sa-Token 权限认证（Reactor响应式集成）, 在线文档：https://sa-token.cc -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-reactor-spring-boot4-starter</artifactId>
+            <version>1.45.0</version>
+        </dependency>
+        <!-- Sa-Token 整合 RedisTemplate -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-redis-template</artifactId>
+            <version>1.45.0</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
+        <!-- Sentinel -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-starter-alibaba-sentinel</artifactId>
+        </dependency>
+        <!-- Sentinel Spring Cloud Gateway 适配器 -->
+        <dependency>
+            <groupId>com.alibaba.cloud</groupId>
+            <artifactId>spring-cloud-alibaba-sentinel-gateway</artifactId>
+        </dependency>
+        <!-- Sentinel Transport (用于连接 Dashboard) -->
+        <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-transport-simple-http</artifactId>
+        </dependency>
+        <!-- Sentinel Datasource (使用 Nacos 存储规则) -->
+        <dependency>
+            <groupId>com.alibaba.csp</groupId>
+            <artifactId>sentinel-datasource-nacos</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>

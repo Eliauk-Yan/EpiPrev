@@ -1,15 +1,12 @@
-package com.nexo.common.base.exception.code.impl;
+package com.epiprev.common.base.exception.code.impl;
 
-
-import com.nexo.common.base.exception.code.ErrorCode;
+import com.epiprev.common.base.exception.code.ErrorCode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 
 /**
  * @classname BusinessErrorCode
  * @description 业务错误码
- * @date 2025/12/01
- * @created by YanShijie
  */
 @Getter
 @AllArgsConstructor

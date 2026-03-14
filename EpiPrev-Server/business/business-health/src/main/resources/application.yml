@@ -1,0 +1,12 @@
+server:
+  port: 9004
+spring:
+  application:
+    name: business-health
+  config:
+    import:
+      - classpath:datasource.yml
+      - classpath:cache.yml
+      - classpath:config.yml
+      - classpath:rpc.yml
+      - classpath:ai.yml

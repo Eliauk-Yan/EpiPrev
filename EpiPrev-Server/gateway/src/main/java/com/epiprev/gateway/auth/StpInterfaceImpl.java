@@ -1,11 +1,11 @@
-package com.nexo.gateway.auth;
+package com.epiprev.gateway.auth;
 
 import cn.dev33.satoken.stp.StpInterface;
 import cn.dev33.satoken.stp.StpUtil;
-import com.nexo.common.api.user.constant.UserPermission;
-import com.nexo.common.api.user.constant.UserRole;
-import com.nexo.common.api.user.constant.UserState;
-import com.nexo.common.api.user.response.data.UserInfo;
+import com.epiprev.common.api.user.constant.UserPermission;
+import com.epiprev.common.api.user.constant.UserRole;
+import com.epiprev.common.api.user.constant.UserState;
+import com.epiprev.common.api.user.response.data.UserInfo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -14,8 +14,6 @@ import java.util.List;
 /**
  * @classname StpInterfaceImpl
  * @description Sa-Token 权限验证接口实现类
- * @date 2025/12/08 20:03
- * @created by YanShijie
  */
 @Slf4j
 @Component
@@ -39,7 +37,7 @@ public class StpInterfaceImpl implements StpInterface {
         // 3. 获取当前用户的状态
         UserState state = userInfo.getState();
         // 4. 根据用户状态或角色返回相应的权限
-        if (role == UserRole.ADMIN || state == UserState.AUTHENTICATED || state == UserState.ACTIVE) {
+        if (role == UserRole.ADMIN || state == UserState.AUTH) {
             return List.of(UserPermission.BASIC.getCode(), UserPermission.AUTHENTICATE.getCode());
         }
         if (state == UserState.INIT) {

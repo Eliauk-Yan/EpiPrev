@@ -44,7 +44,7 @@ const aiSuggestionLoading = ref(false);
 const aiDialogVisible = ref(false);
 const aiDialogTitle = ref("");
 const aiDialogContent = ref("");
-const dailyTip = ref("正在生成今日健康小贴士..."); // 今日小贴士
+const dailyTip = ref("正在生成健康小贴士..."); // 今日小贴士
 
 // 恢复 AI 函数
 const handleAIAnalysis = async (type: string = "general") => {
@@ -243,9 +243,6 @@ const handleAddRecord = async () => {
     // 刷新数据
     fetchTodayRecord();
     fetchSleepStats();
-    // 刷新数据
-    fetchTodayRecord();
-    fetchSleepStats();
   } catch (error) {
     ElMessage.error("添加失败，请重试");
     console.error(error);
@@ -255,9 +252,6 @@ const handleAddRecord = async () => {
 // 初始化
 onMounted(() => {
   if (userStore.isLoggedIn) {
-    fetchTodayRecord();
-    fetchSleepStats();
-    fetchDailyTip();
     fetchTodayRecord();
     fetchSleepStats();
     fetchDailyTip();
@@ -354,23 +348,7 @@ const stepsProgress = computed(() => {
 });
 
 // 心率与血压状态（基于当前输入值，模拟实时监测）
-const heartStatus = computed(() => {
-  const hr = Number(newRecord.value.heartRate);
-  if (!hr) return { text: "待输入", color: "#909399" };
-  if (hr < 60) return { text: "心率偏低", color: "#E6A23C" };
-  if (hr <= 100) return { text: "心率正常", color: "#67C23A" };
-  return { text: "心率偏快", color: "#F56C6C" };
-});
 
-const bpStatus = computed(() => {
-  const s = Number(newRecord.value.systolic);
-  const d = Number(newRecord.value.diastolic);
-  if (!s || !d) return { text: "待输入", color: "#909399" };
-  if (s < 90 || d < 60) return { text: "血压偏低", color: "#E6A23C" };
-  if (s <= 120 && d <= 80) return { text: "血压理想", color: "#67C23A" };
-  if (s <= 140 && d <= 90) return { text: "血压偏高", color: "#E6A23C" };
-  return { text: "血压过高", color: "#F56C6C" };
-});
 
 // 饮水达标（默认目标 2000 ml）
 const waterProgress = computed(() => {
@@ -448,18 +426,9 @@ const handleAISuggestion = async () => {
         </div>
 
         <div v-if="userStore.isLoggedIn" class="record-container">
-          <!-- 今日已打卡显示 -->
-          <div v-if="hasTodayRecord" class="input-card checked-card">
-            <div class="checked-content">
-              <div class="checked-icon">🎉</div>
-              <h3>今日已打卡</h3>
-              <p>做得好！请继续保持健康的生活方式。</p>
-            </div>
-          </div>
-
-          <!-- 未打卡显示输入表单 -->
-          <div v-else class="input-card">
-            <h3><span class="dot"></span>今日打卡</h3>
+          <!-- 打卡记录输入表单（支持实时修改） -->
+          <div class="input-card">
+            <h3><span class="dot"></span>{{ hasTodayRecord ? '修改今日记录' : '今日打卡' }}</h3>
             <div class="input-grid wide">
               <div class="input-group">
                 <span class="input-label">体重 (kg)</span>
@@ -567,7 +536,7 @@ const handleAISuggestion = async () => {
               @click="handleAddRecord"
               round
             >
-              提交记录
+              {{ hasTodayRecord ? '更新记录' : '提交记录' }}
             </el-button>
           </div>
         </div>
@@ -732,7 +701,7 @@ const handleAISuggestion = async () => {
       <div class="dashboard-column right-column">
         <!-- 单独的小贴士卡片（在仪表盘大卡片上方） -->
         <div class="right-tip-card">
-          <div class="tip-header">💡 每日小贴士</div>
+          <div class="tip-header">💡 健康小贴士</div>
           <p class="tip-content">
             {{ dailyTip }}
           </p>

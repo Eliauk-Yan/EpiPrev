@@ -1,0 +1,12 @@
+server:
+  port: 9005
+
+spring:
+  application:
+    name: admin
+  config:
+    import:
+      - classpath:config.yml
+      - classpath:rpc.yml
+      - classpath:cache.yml
+

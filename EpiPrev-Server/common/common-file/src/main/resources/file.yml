@@ -1,0 +1,6 @@
+rustfs:
+  enabled: true
+  endpoint: http://47.99.39.81:9000
+  access-key: yanshijie
+  secret-key: B@n@n@_La15_YSJ
+  bucket-name: epiprev

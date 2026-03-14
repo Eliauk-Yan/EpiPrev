@@ -1,4 +1,14 @@
 package com.epiprev.admin.controller.params;
 
-public class UserUpdataStateParams {
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class UserUpdateStateParams {
+
+    private Long id;
+
+    private String status;
+
 }

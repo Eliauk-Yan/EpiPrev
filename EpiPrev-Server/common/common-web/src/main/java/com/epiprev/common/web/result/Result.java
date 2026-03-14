@@ -1,13 +1,11 @@
-package com.nexo.common.web.result;
+package com.epiprev.common.web.result;
 
-import com.nexo.common.web.result.enums.ResultCode;
+import com.epiprev.common.web.result.enums.ResultCode;
 import lombok.Data;
 
 /**
  * @classname Result
  * @description 统一返回对象
- * @date 2025/11/27 21:01
- * @created by YanShijie
  */
 @Data
 public class Result<T> {

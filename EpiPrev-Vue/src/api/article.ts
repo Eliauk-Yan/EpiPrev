@@ -42,7 +42,7 @@ export interface PageResult<T> {
  * @param params 查询参数
  */
 export function getArticleList(params: ArticleListParams) {
-  return request.get<any, PageResult<ArticleVO>>("/article/list", { params });
+    return request.get<any, PageResult<ArticleVO>>("/article/list", { params });
 }
 
 /**
@@ -50,7 +50,7 @@ export function getArticleList(params: ArticleListParams) {
  * @param id 文章ID
  */
 export function getArticleDetail(id: number | string) {
-    return request.get<any, ArticleVO>(`/article/${id}`);
+    return request.get<any, ArticleVO>(`/article/detail/${id}`);
 }
 
 /**

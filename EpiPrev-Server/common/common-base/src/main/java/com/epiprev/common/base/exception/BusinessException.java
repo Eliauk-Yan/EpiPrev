@@ -1,13 +1,11 @@
-package com.nexo.common.base.exception;
+package com.epiprev.common.base.exception;
 
-import com.nexo.common.base.exception.code.ErrorCode;
+import com.epiprev.common.base.exception.code.ErrorCode;
 import lombok.Getter;
 
 /**
  * @classname BusinessException
  * @description 业务异常
- * @date 2025/12/01 09:40
- * @created by YanShijie
  */
 @Getter
 public class BusinessException extends RuntimeException {

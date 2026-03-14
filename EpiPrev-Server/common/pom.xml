@@ -3,6 +3,7 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
     <parent>
         <groupId>com.epiprev</groupId>
         <artifactId>EpiPrev-Server</artifactId>
@@ -11,6 +12,19 @@
 
     <groupId>com.epiprev.common</groupId>
     <artifactId>common</artifactId>
+    <packaging>pom</packaging>
+
+    <modules>
+        <module>common-api</module>
+        <module>common-cache</module>
+        <module>common-config</module>
+        <module>common-web</module>
+        <module>common-rpc</module>
+        <module>common-base</module>
+        <module>common-datasource</module>
+        <module>common-file</module>
+        <module>common-ai</module>
+    </modules>
 
     <properties>
         <maven.compiler.source>25</maven.compiler.source>
@@ -18,4 +32,17 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <!--lombok 简化代码-->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+        <!--hutool 工具包-->
+        <dependency>
+            <groupId>cn.hutool</groupId>
+            <artifactId>hutool-all</artifactId>
+            <version>5.8.41</version>
+        </dependency>
+    </dependencies>
 </project>

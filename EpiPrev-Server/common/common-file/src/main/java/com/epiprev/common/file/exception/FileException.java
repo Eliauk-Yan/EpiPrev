@@ -1,13 +1,11 @@
-package com.nexo.common.file.domain.exception;
+package com.epiprev.common.file.exception;
 
-import com.nexo.common.base.exception.BusinessException;
-import com.nexo.common.base.exception.code.ErrorCode;
+import com.epiprev.common.base.exception.BusinessException;
+import com.epiprev.common.base.exception.code.ErrorCode;
 
 /**
  * @classname FileException
  * @description 文件存储异常
- * @date 2025/12/12 10:50
- * @created by YanShijie
  */
 public class FileException extends BusinessException {
 

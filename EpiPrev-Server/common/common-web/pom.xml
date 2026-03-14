@@ -18,4 +18,41 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <!--web 启动器-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!--全局缓存模块-->
+        <dependency>
+            <groupId>com.epiprev.common.cache</groupId>
+            <artifactId>common-cache</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!--基础模块-->
+        <dependency>
+            <groupId>com.epiprev.common.base</groupId>
+            <artifactId>common-base</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!-- Sa-Token 权限认证（SpringBoot3集成）-->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-spring-boot4-starter</artifactId>
+            <version>1.45.0</version>
+        </dependency>
+        <!-- Sa-Token 整合 Redis （使用 jackson 序列化方式） -->
+        <dependency>
+            <groupId>cn.dev33</groupId>
+            <artifactId>sa-token-redis-jackson</artifactId>
+            <version>1.45.0</version>
+        </dependency>
+        <!-- Sa-Token 集成 Redis -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-pool2</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>

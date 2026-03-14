@@ -1,13 +1,11 @@
-package com.nexo.common.base.exception;
+package com.epiprev.common.base.exception;
 
-import com.nexo.common.base.exception.code.ErrorCode;
+import com.epiprev.common.base.exception.code.ErrorCode;
 import lombok.Getter;
 
 /**
  * @classname SystemException
  * @description 系统异常
- * @date 2025/12/01
- * @created by YanShijie
  */
 @Getter
 public class SystemException extends RuntimeException {

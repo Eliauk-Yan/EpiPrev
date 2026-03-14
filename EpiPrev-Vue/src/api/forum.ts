@@ -55,7 +55,7 @@ export interface PageResult<T> {
  * @param params 查询参数
  */
 export function getPostList(params?: PostListParams) {
-    return request.get<any, PageResult<PostVO>>("/forum/list", { params });
+    return request.get<any, PageResult<PostVO>>("/forum/post/list", { params });
 }
 
 /**
@@ -63,7 +63,8 @@ export function getPostList(params?: PostListParams) {
  * @param limit 限制条数，默认5条
  */
 export function getHotPosts(limit: number = 5) {
-    return request.get<any, PostVO[]>("/forum/hot", { params: { limit } });
+    // 后端没有专门的 hot 接口，使用 list 加 limit
+    return request.get<any, PageResult<PostVO>>("/forum/post/list", { params: { size: limit } });
 }
 
 /**
@@ -71,7 +72,7 @@ export function getHotPosts(limit: number = 5) {
  * @param postId 帖子ID
  */
 export function getPostDetail(postId: number | string) {
-    return request.get<any, PostVO>(`/forum/detail/${postId}`);
+    return request.get<any, PostVO>(`/forum/post/detail/${postId}`);
 }
 
 /**
@@ -79,7 +80,7 @@ export function getPostDetail(postId: number | string) {
  * @param data 帖子数据
  */
 export function createPost(data: PostDTO) {
-    return request.post<any, boolean>("/forum/post", data);
+    return request.post<any, boolean>("/forum/post/publish", null, { params: data });
 }
 
 /**
@@ -87,5 +88,5 @@ export function createPost(data: PostDTO) {
  * @param data 评论数据
  */
 export function createComment(data: CommentDTO) {
-    return request.post<any, boolean>("/forum/comment", data);
+    return request.post<any, boolean>("/forum/comment/publish", null, { params: data });
 }

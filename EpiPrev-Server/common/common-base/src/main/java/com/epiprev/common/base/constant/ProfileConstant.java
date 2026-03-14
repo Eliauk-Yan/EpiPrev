@@ -1,4 +1,4 @@
-package com.nexo.common.base.constant;
+package com.epiprev.common.base.constant;
 
 /**
  * @classname ProfileConstant

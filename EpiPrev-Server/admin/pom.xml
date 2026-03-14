@@ -18,4 +18,35 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <!-- WEB公共模块 -->
+        <dependency>
+            <groupId>com.epiprev.common.web</groupId>
+            <artifactId>common-web</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!-- 接口模块 -->
+        <dependency>
+            <groupId>com.epiprev.common.api</groupId>
+            <artifactId>common-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!-- Dubbo模块 -->
+        <dependency>
+            <groupId>com.epiprev.common.rpc</groupId>
+            <artifactId>common-rpc</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.epiprev.common.config</groupId>
+            <artifactId>common-config</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>com.epiprev.common.cache</groupId>
+            <artifactId>common-cache</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
 </project>

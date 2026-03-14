@@ -18,4 +18,43 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     </properties>
 
+    <dependencies>
+        <!--公共API接口-->
+        <dependency>
+            <groupId>com.epiprev.common.api</groupId>
+            <artifactId>common-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!--公共配置-->
+        <dependency>
+            <groupId>com.epiprev.common.config</groupId>
+            <artifactId>common-config</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!--公共web-->
+        <dependency>
+            <groupId>com.epiprev.common.web</groupId>
+            <artifactId>common-web</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!--缓存-->
+        <dependency>
+            <groupId>com.epiprev.common.cache</groupId>
+            <artifactId>common-cache</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!--RPC服务-->
+        <dependency>
+            <groupId>com.epiprev.common.rpc</groupId>
+            <artifactId>common-rpc</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <!--基础模块-->
+        <dependency>
+            <groupId>com.epiprev.common.base</groupId>
+            <artifactId>common-base</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+    </dependencies>
+
 </project>

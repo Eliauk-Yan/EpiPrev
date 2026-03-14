@@ -3,23 +3,25 @@ import request from "@/utils/request";
 /** User info type */
 export interface UserInfo {
     id: number | string;
-    username: string;
-    email: string;
+    nickName: string;
     avatar: string;
-    phone: string;
+    telephone: string;
+    state: string;
+    certification: boolean;
+    role: string;
     createTime: string;
 }
 
 /** Login Data */
 export interface LoginData {
-    username: string;
+    phone: string;
     password?: string;
     rememberMe?: boolean;
 }
 
 /** Register Data */
 export interface RegisterData {
-    username: string;
+    nickName: string;
     password?: string;
     email?: string;
     phone?: string;
@@ -29,6 +31,13 @@ export interface RegisterData {
 export interface LoginResult {
     token: string;
     userInfo: UserInfo;
+}
+
+/** User Update Data */
+export interface UserUpdateData {
+    nickName?: string;
+    avatar?: string;
+    telephone?: string;
 }
 
 /** Login API */
@@ -46,20 +55,21 @@ export function logout() {
     return request.post<any, boolean>("/auth/logout");
 }
 
-/** User Update Data */
-export interface UserUpdateData {
-    username?: string;
-    email?: string;
-    phone?: string;
-    avatar?: string;
-}
-
 /** Get User Info API */
 export function getUserInfo() {
-    return request.get<any, UserInfo>("/user/info");
+    return request.get<any, UserInfo>("/user/getUserInfo");
 }
 
-/** Update User Info API */
-export function updateUserInfo(data: UserUpdateData) {
-    return request.put<any, void>("/user/info", data);
+/** Update Avatar API */
+export function updateAvatar(file: File) {
+    const formData = new FormData();
+    formData.append("avatar", file);
+    return request.put<any, boolean>("/user/avatar", formData, {
+        headers: { "Content-Type": "multipart/form-data" }
+    });
+}
+
+/** Update Nickname API */
+export function updateNickName(nickName: string) {
+    return request.post<any, boolean>("/user/modifyNickName", null, { params: { nickName } });
 }

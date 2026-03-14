@@ -1,7 +1,7 @@
-package com.nexo.common.file.config;
+package com.epiprev.common.file.config;
 
-import com.nexo.common.file.service.FileService;
-import com.nexo.common.file.service.impl.FileServiceImpl;
+import com.epiprev.common.file.service.FileService;
+import com.epiprev.common.file.service.impl.FileServiceImpl;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.AutoConfiguration;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
@@ -20,8 +20,6 @@ import java.net.URI;
 /**
  * @classname FileConfiguration
  * @description 文件存储配置 (RustFS/S3)
- * @date 2025/12/12 10:45
- * @created by YanShijie
  */
 @Slf4j
 @AutoConfiguration

@@ -1,4 +1,4 @@
-package com.nexo.common.file.constant;
+package com.epiprev.common.file.constant;
 
 /**
  * @classname FileConstant

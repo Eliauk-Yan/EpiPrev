@@ -1,12 +1,10 @@
-package com.nexo.common.file.service;
+package com.epiprev.common.file.service;
 
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @classname FileService
  * @description 文件存储服务接口 (RustFS/S3 兼容)
- * @date 2025/12/12 10:52
- * @created by YanShijie
  */
 public interface FileService {
 

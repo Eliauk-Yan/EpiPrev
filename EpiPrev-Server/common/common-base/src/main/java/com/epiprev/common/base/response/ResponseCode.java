@@ -1,4 +1,4 @@
-package com.nexo.common.api.common.response;
+package com.epiprev.common.base.response;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
