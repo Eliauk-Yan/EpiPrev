@@ -32,6 +32,9 @@ public class SaTokenConfigure {
                     SaRouter.match("/**",  _ -> StpUtil.checkLogin());
                     // 管理端模块 -> 用户角色校验
                     SaRouter.match("/admin/**", r -> StpUtil.checkRoleOr(UserRole.ADMIN.getCode()));
+                    // 发帖/评论 -> 需要实名认证（AUTH 状态）
+                    SaRouter.match("/forum/post/publish", "/forum/comment/publish")
+                            .check(r -> StpUtil.checkPermission(UserPermission.AUTHENTICATE.getCode()));
                 })
                 // 异常处理方法：每次setAuth函数出现异常时进入
                 .setError(this::getSaResult);

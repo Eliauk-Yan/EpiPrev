@@ -9,9 +9,11 @@ public class ArticleVO {
     private String title;
     private String category;
     private String summary;
+    private String content;
     private String cover;
     private String videoUrl;
     private Integer type;
     private Integer views;
     private LocalDateTime createTime;
+    private LocalDateTime updateTime;
 }

@@ -51,6 +51,11 @@ spring:
               uri: lb://business-health
               predicates:
                 - Path=/health/**
+            # 新闻资讯模块
+            - id: business-news
+              uri: lb://business-news
+              predicates:
+                - Path=/news/**
     sentinel:
       transport:
         dashboard: 47.99.39.81:8858 # Sentinel 控制台地址，用于监控和交互

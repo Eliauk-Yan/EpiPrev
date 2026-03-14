@@ -47,6 +47,12 @@
             <artifactId>common-cache</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
+        <dependency>
+            <groupId>com.epiprev.common.file</groupId>
+            <artifactId>common-file</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
     </dependencies>
 
 </project>

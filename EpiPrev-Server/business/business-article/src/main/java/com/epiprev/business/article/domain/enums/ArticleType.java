@@ -17,4 +17,16 @@ public enum ArticleType {
 
     private final String description;
 
+    public static ArticleType fromCode(Integer code) {
+        if (code == null) {
+            return null;
+        }
+        for (ArticleType value : values()) {
+            if (value.code.equals(code)) {
+                return value;
+            }
+        }
+        return null;
+    }
+
 }

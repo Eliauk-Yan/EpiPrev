@@ -75,4 +75,11 @@ public class Result<T> {
     public static <T> Result<T> error(ResultCode resultCode, String message) {
         return new Result<>(false, resultCode.getCode(), message, null);
     }
+
+    /**
+     * 失败返回，仅消息
+     */
+    public static <T> Result<T> fail(String message) {
+        return new Result<>(false, ResultCode.FAIL.getCode(), message, null);
+    }
 }

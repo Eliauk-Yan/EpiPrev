@@ -1,0 +1,12 @@
+server:
+  port: 9006
+spring:
+  application:
+    name: business-news
+  config:
+    import:
+      - classpath:datasource.yml
+      - classpath:cache.yml
+      - classpath:config.yml
+      - classpath:rpc.yml
+

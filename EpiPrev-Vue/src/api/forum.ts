@@ -8,7 +8,7 @@ export interface PostVO {
     authorId: number;
     authorName: string;
     views: number;
-    replies: number;
+    replyCount: number;
     createTime: string;
     comments?: CommentVO[];
 }
@@ -89,4 +89,11 @@ export function createPost(data: PostDTO) {
  */
 export function createComment(data: CommentDTO) {
     return request.post<any, boolean>("/forum/comment/publish", null, { params: data });
+}
+
+/**
+ * 获取当前用户发布的帖子列表（我的帖子）
+ */
+export function getMyPosts(params?: PostListParams) {
+    return request.get<any, PageResult<PostVO>>("/forum/post/my", { params });
 }

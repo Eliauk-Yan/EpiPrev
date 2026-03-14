@@ -10,7 +10,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin/comment")
+@RequestMapping("/comment")
 public class CommentController {
 
     private final CommentService commentService;
@@ -20,11 +20,6 @@ public class CommentController {
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String content) {
         return commentService.pageComment(page, size, content);
-    }
-
-    @GetMapping("/{id}")
-    public Result<Map<String, Object>> getById(@PathVariable Long id) {
-        return commentService.getCommentById(id);
     }
 
     @DeleteMapping("/{id}")

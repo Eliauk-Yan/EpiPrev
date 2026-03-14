@@ -16,7 +16,7 @@ public interface CommentService {
     MultiResult<Map<String, Object>> pageComment(Integer page, Integer size, String content);
 
     /**
-     * 根据Id查询评论
+     * 根据 Id 查询评论
      */
     Result<Map<String, Object>> getCommentById(Long id);
 

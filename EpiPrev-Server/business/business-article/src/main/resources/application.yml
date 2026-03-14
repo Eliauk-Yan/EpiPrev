@@ -8,3 +8,4 @@ spring:
       - classpath:datasource.yml
       - classpath:cache.yml
       - classpath:config.yml
+      - classpath:rpc.yml

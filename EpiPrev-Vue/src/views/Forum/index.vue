@@ -6,6 +6,7 @@ import {
   getPostList,
   getHotPosts,
   getPostDetail,
+  getMyPosts,
   createPost,
   createComment,
   type PostVO,
@@ -22,28 +23,68 @@ const posts = ref<PostVO[]>([]);
 const hotPosts = ref<PostVO[]>([]);
 const searchKeyword = ref("");
 
+// 菜单状态：all / hot / mine
+const activeMenu = ref<"all" | "hot" | "mine">("all");
+
 // 加载状态
 const loading = ref(false);
 const hotLoading = ref(false);
+const myPostsLoading = ref(false);
 
-// 根据关键词过滤帖子（前端过滤，也可以传word参数到后端）
+// 我的帖子（由后端接口返回）
+const myPosts = ref<PostVO[]>([]);
+
+// 根据菜单和关键词过滤帖子
 const filteredPosts = computed(() => {
-  if (!searchKeyword.value.trim()) {
-    return posts.value;
+  let list = posts.value;
+
+  if (searchKeyword.value.trim()) {
+    const keyword = searchKeyword.value.toLowerCase();
+    list = list.filter(
+      (post) =>
+        post.title?.toLowerCase().includes(keyword) ||
+        post.content?.toLowerCase().includes(keyword)
+    );
   }
-  const keyword = searchKeyword.value.toLowerCase();
-  return posts.value.filter(
-    (post) =>
-      post.title?.toLowerCase().includes(keyword) ||
-      post.content?.toLowerCase().includes(keyword)
-  );
+
+  // 热门讨论：按评论数倒序
+  if (activeMenu.value === "hot") {
+    return [...list].sort(
+      (a, b) => (b.replyCount || 0) - (a.replyCount || 0)
+    );
+  }
+
+  return list;
 });
+
+// 我的帖子列表（含关键词过滤）
+const filteredMyPosts = computed(() => {
+  let list = myPosts.value;
+  if (searchKeyword.value.trim()) {
+    const keyword = searchKeyword.value.toLowerCase();
+    list = list.filter(
+      (post) =>
+        post.title?.toLowerCase().includes(keyword) ||
+        post.content?.toLowerCase().includes(keyword)
+    );
+  }
+  return list;
+});
+
+// 当前列表展示的数据：我的帖子用 my，其余用 filteredPosts
+const displayPosts = computed(() =>
+  activeMenu.value === "mine" ? filteredMyPosts.value : filteredPosts.value
+);
+const displayLoading = computed(() =>
+  activeMenu.value === "mine" ? myPostsLoading.value : loading.value
+);
 
 const fetchPosts = async () => {
   loading.value = true;
   try {
     const res = await getPostList();
     posts.value = res.data || [];
+    console.log(posts);
   } catch (error) {
     console.error("Failed to fetch posts", error);
   } finally {
@@ -55,11 +96,35 @@ const fetchHotPosts = async () => {
   hotLoading.value = true;
   try {
     const res = await getHotPosts(5);
-    hotPosts.value = res || [];
+    hotPosts.value = res.data || [];
   } catch (error) {
     console.error("Failed to fetch hot posts", error);
   } finally {
     hotLoading.value = false;
+  }
+};
+
+const fetchMyPosts = async () => {
+  if (!userStore.isLoggedIn) {
+    myPosts.value = [];
+    return;
+  }
+  myPostsLoading.value = true;
+  try {
+    const res = await getMyPosts({ current: 1, size: 50 });
+    myPosts.value = res.data || [];
+  } catch (error) {
+    console.error("Failed to fetch my posts", error);
+    myPosts.value = [];
+  } finally {
+    myPostsLoading.value = false;
+  }
+};
+
+const switchMenu = (menu: "all" | "hot" | "mine") => {
+  activeMenu.value = menu;
+  if (menu === "mine") {
+    fetchMyPosts();
   }
 };
 
@@ -95,6 +160,7 @@ const handleSubmitPost = async () => {
     ElMessage.success("发布成功");
     fetchPosts();
     fetchHotPosts();
+    if (activeMenu.value === "mine") fetchMyPosts();
   } catch (error) {
     console.error("Failed to create post", error);
   }
@@ -141,7 +207,7 @@ const formatDate = (dateStr: string) => {
 <template>
   <div class="forum-page">
     <div class="forum-container">
-      
+
       <!-- Left Column: Actions -->
       <aside class="left-sidebar">
         <div class="action-card">
@@ -149,9 +215,28 @@ const formatDate = (dateStr: string) => {
             ✏️ 发布帖子
           </el-button>
           <div class="menu-list">
-             <div class="menu-item active">🏠 全部帖子</div>
-             <div class="menu-item">🔥 热门讨论</div>
-             <div class="menu-item">⭐ 我的收藏</div>
+             <div
+               class="menu-item"
+               :class="{ active: activeMenu === 'all' }"
+               @click="switchMenu('all')"
+             >
+               🏠 全部帖子
+             </div>
+             <div
+               class="menu-item"
+               :class="{ active: activeMenu === 'hot' }"
+               @click="switchMenu('hot')"
+             >
+               🔥 热门讨论
+             </div>
+             <div
+               v-if="userStore.isLoggedIn"
+               class="menu-item"
+               :class="{ active: activeMenu === 'mine' }"
+               @click="switchMenu('mine')"
+             >
+               ✍️ 我的帖子
+             </div>
           </div>
         </div>
       </aside>
@@ -175,9 +260,9 @@ const formatDate = (dateStr: string) => {
           </div>
 
           <!-- Post List View -->
-          <div class="post-list" v-if="!selectedPost" v-loading="loading">
+          <div class="post-list" v-if="!selectedPost" v-loading="displayLoading">
             <div
-              v-for="post in filteredPosts"
+              v-for="post in displayPosts"
               :key="post.id"
               class="post-card"
               @click="viewPostDetail(post)"
@@ -187,10 +272,10 @@ const formatDate = (dateStr: string) => {
               <div class="post-meta">
                 <span>👤 {{ post.authorName }}</span>
                 <span>📅 {{ formatDate(post.createTime) }}</span>
-                <span>💬 {{ post.replies || 0 }} 回复</span>
+                <span>💬 {{ post.replyCount || 0 }} 回复</span>
               </div>
             </div>
-            <el-empty v-if="filteredPosts.length === 0 && !loading" :description="searchKeyword ? '未找到匹配的帖子' : '暂无帖子'" />
+            <el-empty v-if="displayPosts.length === 0 && !displayLoading" :description="activeMenu === 'mine' ? (searchKeyword ? '未找到匹配的帖子' : '您还没有发布过帖子') : (searchKeyword ? '未找到匹配的帖子' : '暂无帖子')" />
           </div>
 
         <!-- Post Detail View -->
@@ -243,13 +328,13 @@ const formatDate = (dateStr: string) => {
       <!-- Right Column: Hot Posts -->
       <aside class="right-sidebar">
         <div class="hot-card">
-          <h3 class="card-title">🔥 热门帖子</h3>
+          <h3 class="card-title">📰 最新帖子</h3>
           <div class="hot-list" v-loading="hotLoading">
-            <div 
-              v-for="(post, index) in hotPosts" 
-              :key="post.id" 
+            <div
+              v-for="(post, index) in hotPosts"
+              :key="post.id"
               class="hot-item"
-              @click="selectedPost = post"
+              @click="viewPostDetail(post)"
             >
               <span class="hot-index" :class="{'top-3': index < 3}">{{ index + 1 }}</span>
               <span class="hot-title">{{ post.title }}</span>
@@ -623,7 +708,7 @@ const formatDate = (dateStr: string) => {
   .forum-container {
     grid-template-columns: 1fr;
   }
-  
+
   .left-sidebar, .right-sidebar {
     display: none; /* For simplicity on small screens, or stack them */
   }

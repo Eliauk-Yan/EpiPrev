@@ -13,12 +13,7 @@ public interface PostService {
     /**
      * 分页查询帖子
      */
-    MultiResult<Map<String, Object>> pagePost(Integer page, Integer size, String title);
-
-    /**
-     * 根据Id查询帖子
-     */
-    Result<Map<String, Object>> getPostById(Long id);
+    MultiResult<Map<String, Object>> pagePost(Integer current, Integer size, String title);
 
     /**
      * 删除帖子

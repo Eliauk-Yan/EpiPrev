@@ -10,7 +10,7 @@ import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/admin/post")
+@RequestMapping("/post")
 public class PostController {
 
     private final PostService postService;
@@ -20,11 +20,6 @@ public class PostController {
             @RequestParam(defaultValue = "10") Integer size,
             @RequestParam(required = false) String title) {
         return postService.pagePost(page, size, title);
-    }
-
-    @GetMapping("/{id}")
-    public Result<Map<String, Object>> getById(@PathVariable Long id) {
-        return postService.getPostById(id);
     }
 
     @DeleteMapping("/{id}")

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from "vue";
 import { useRoute, useRouter } from "vue-router";
-import { ArrowLeft, View, Calendar, Folder } from "@element-plus/icons-vue";
+import { ArrowLeft, View, Calendar, Folder, VideoCamera } from "@element-plus/icons-vue";
 import { getArticleDetail, ArticleType, type ArticleVO } from "@/api/article";
 
 const route = useRoute();
@@ -11,7 +11,29 @@ const article = ref<ArticleVO | null>(null);
 const loading = ref(true);
 
 // 判断是否为视频类型
-const isVideo = computed(() => article.value?.type === ArticleType.VIDEO);
+const isVideo = computed(() => {
+  // 检查是否有视频URL
+  if (article.value?.videoUrl) {
+    return true;
+  }
+  // 检查是否有vedioURL（注意拼写）
+  if (article.value?.vedioURL) {
+    return true;
+  }
+  // 检查类型是否为视频
+  return article.value?.type === ArticleType.VIDEO;
+});
+
+// 视频URL，添加时间戳以绕过If-Modified-Since请求头问题
+const videoSrc = computed(() => {
+  const url = article.value?.videoUrl || article.value?.vedioURL;
+  if (!url) return '';
+  // 添加时间戳参数，确保每次请求都是新的
+  const timestamp = new Date().getTime();
+  // 检查URL是否已有查询参数
+  const separator = url.includes('?') ? '&' : '?';
+  return `${url}${separator}t=${timestamp}`;
+});
 
 // 格式化日期
 const formatDate = (dateStr: string | undefined) => {
@@ -46,6 +68,7 @@ const fetchDetail = async () => {
   try {
     const id = route.params.id as string;
     article.value = await getArticleDetail(id);
+    console.log('文章详情数据:', article.value);
   } catch (error) {
     console.error('加载文章详情失败:', error);
   } finally {
@@ -107,19 +130,33 @@ onMounted(() => {
       <!-- 主内容区域 -->
       <main class="article-main">
         <!-- 视频播放器 -->
-        <div v-if="isVideo && article.videoUrl" class="video-section">
-          <video 
-            :src="article.videoUrl" 
-            controls 
-            :poster="article.cover"
-            class="video-player"
-          >
-            您的浏览器不支持视频播放
-          </video>
+        <div v-if="isVideo && (article.videoUrl || article.vedioURL)" class="video-section">
+          <el-card class="video-card" shadow="hover">
+            <template #header>
+              <div class="video-header">
+                <el-icon class="video-icon"><VideoCamera /></el-icon>
+                <span class="video-title">{{ article.title }}</span>
+              </div>
+            </template>
+            <div class="video-player-wrapper">
+              <video 
+                :src="videoSrc" 
+                controls 
+                :poster="article.cover"
+                class="video-player"
+                crossorigin="anonymous"
+              >
+                您的浏览器不支持视频播放
+              </video>
+            </div>
+          </el-card>
         </div>
+        <el-empty v-else-if="isVideo" description="视频资源不存在" :image-size="120">
+          <el-button type="primary" @click="router.back()">返回列表</el-button>
+        </el-empty>
 
         <!-- 文章正文 -->
-        <article class="article-content" v-html="renderMarkdown(article.content)"></article>
+        <article class="article-content" v-html="renderMarkdown(article.content || '')"></article>
 
         <!-- 分隔线和底部信息 -->
         <footer class="article-footer">
@@ -298,13 +335,38 @@ onMounted(() => {
   margin: -100px 0 50px 0;
   position: relative;
   z-index: 10;
+}
+
+.video-card {
   border-radius: 16px;
   overflow: hidden;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+}
+
+.video-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  color: #303133;
+}
+
+.video-icon {
+  font-size: 20px;
+  color: #667eea;
+}
+
+.video-player-wrapper {
+  position: relative;
+  border-radius: 8px;
+  overflow: hidden;
+  background: #000;
 }
 
 .video-player {
   width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
   display: block;
   background: #000;
 }

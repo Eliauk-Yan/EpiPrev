@@ -144,7 +144,7 @@ onMounted(() => {
               v-for="item in hotVideos"
               :key="item.id"
               class="video-card"
-              @click="router.push(`/knowledge/${item.id}`)"
+              @click="router.push({ path: `/knowledge/${item.id}`, query: { type: 'video' } })"
             >
               <div class="video-cover" :style="{ backgroundImage: `url(${mapVideoCover(item.cover)})` }">
                 <div class="play-button">

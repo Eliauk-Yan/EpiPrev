@@ -17,6 +17,7 @@
         <module>business-article</module>
         <module>business-forum</module>
         <module>business-health</module>
+        <module>business-news</module>
     </modules>
 
     <properties>

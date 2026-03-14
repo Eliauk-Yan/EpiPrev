@@ -39,4 +39,8 @@ public class MultiResult<T> extends Result<List<T>> {
     public static <T> MultiResult<T> multiError(ResultCode resultCode) {
         return new MultiResult<>(true, resultCode.getCode(), resultCode.getMessage(), null, 0, 0, 0);
     }
+
+    public static <T> MultiResult<T> multiFail(String message) {
+        return new MultiResult<>(false, ResultCode.FAIL.getCode(), message, null, 0, 0, 0);
+    }
 }

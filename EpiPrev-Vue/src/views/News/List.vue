@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
-import { getNewsList } from "@/api/news";
+import { getNewsList, type NewsVO } from "@/api/news";
 import { Search, ArrowRight } from "@element-plus/icons-vue";
 
 const router = useRouter();
 
-const newsList = ref<any[]>([]);
+const newsList = ref<NewsVO[]>([]);
 const total = ref(0);
 const loading = ref(false);
 const queryParams = ref({
@@ -18,9 +18,15 @@ const queryParams = ref({
 const loadNews = async () => {
   loading.value = true;
   try {
-    const res: any = await getNewsList(queryParams.value);
-    newsList.value = res.records;
-    total.value = res.total;
+    const res = await getNewsList({
+      page: queryParams.value.page,
+      size: queryParams.value.size,
+      // 后端使用 word 作为搜索关键词参数名
+      word: queryParams.value.keyword,
+    });
+    // 适配后端 MultiResult 分页返回结构
+    newsList.value = res.data || [];
+    total.value = res.total || 0;
   } catch (error) {
     console.error("Failed to load news:", error);
   } finally {

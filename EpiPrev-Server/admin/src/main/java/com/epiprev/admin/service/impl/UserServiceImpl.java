@@ -1,5 +1,7 @@
 package com.epiprev.admin.service.impl;
 
+import cn.dev33.satoken.session.SaSession;
+import cn.dev33.satoken.stp.StpUtil;
 import com.epiprev.admin.service.UserService;
 import com.epiprev.common.api.user.UserFacade;
 import com.epiprev.common.api.user.constant.UserState;
@@ -46,13 +48,31 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Result<Boolean> updateStatus(Long id, String status) {
-        // 尝试将String状态转换为UserState枚举
         UserState userState = UserState.valueOf(status);
         UserResponse<Boolean> response = userFacade.updateStatus(id, userState);
         if (response.getSuccess()) {
+            refreshUserSession(id, userState);
             return Result.success(response.getData());
         }
         return Result.error(response.getCode(), response.getMessage());
+    }
 
+    /**
+     * 刷新用户 Sa-Token 会话中的状态信息，使权限变更立即生效
+     */
+    private void refreshUserSession(Long userId, UserState newState) {
+        try {
+            SaSession session = StpUtil.getSessionByLoginId(userId, false);
+            if (session != null) {
+                UserInfo userInfo = session.getModel("userInfo", UserInfo.class);
+                if (userInfo != null) {
+                    userInfo.setState(newState);
+                    session.set("userInfo", userInfo);
+                    log.info("已刷新用户会话状态: userId={}, newState={}", userId, newState);
+                }
+            }
+        } catch (Exception e) {
+            log.warn("刷新用户会话信息失败: userId={}", userId, e);
+        }
     }
 }

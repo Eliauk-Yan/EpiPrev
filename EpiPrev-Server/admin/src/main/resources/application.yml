@@ -9,4 +9,5 @@ spring:
       - classpath:config.yml
       - classpath:rpc.yml
       - classpath:cache.yml
+      - classpath:file.yml
 
