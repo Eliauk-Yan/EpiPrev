@@ -1,0 +1,10 @@
+server:
+  port: 9002
+spring:
+  application:
+    name: business-article
+  config:
+    import:
+      - classpath:datasource.yml
+      - classpath:cache.yml
+      - classpath:config.yml

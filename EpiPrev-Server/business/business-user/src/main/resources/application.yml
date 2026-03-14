@@ -1,0 +1,12 @@
+server:
+  port: 9001
+spring:
+  application:
+    name: business-user
+  config:
+    import:
+      - classpath:datasource.yml
+      - classpath:cache.yml
+      - classpath:config.yml
+      - classpath:rpc.yml
+      - classpath:file.yml
