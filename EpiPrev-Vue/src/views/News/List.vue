@@ -2,7 +2,7 @@
 import {ref, onMounted} from "vue";
 import {useRouter} from "vue-router";
 import {getNewsList, type NewsVO} from "@/api/news";
-import {Search, ArrowRight} from "@element-plus/icons-vue";
+import {ArrowRight} from "@element-plus/icons-vue";
 
 const router = useRouter();
 
@@ -12,7 +12,6 @@ const loading = ref(false);
 const queryParams = ref({
   page: 1,
   size: 12,
-  keyword: "",
 });
 
 const loadNews = async () => {
@@ -21,8 +20,6 @@ const loadNews = async () => {
     const res = await getNewsList({
       page: queryParams.value.page,
       size: queryParams.value.size,
-      // 后端使用 word 作为搜索关键词参数名
-      word: queryParams.value.keyword,
     });
     // 适配后端 MultiResult 分页返回结构
     newsList.value = res.data || [];
@@ -32,11 +29,6 @@ const loadNews = async () => {
   } finally {
     loading.value = false;
   }
-};
-
-const handleSearch = () => {
-  queryParams.value.page = 1;
-  loadNews();
 };
 
 const handleCurrentChange = (page: number) => {
@@ -66,22 +58,6 @@ const goToDetail = (news: NewsVO) => {
       <div class="header-content">
         <h1 class="main-title">疫情动态</h1>
         <p class="subtitle">实时掌握最新疫情资讯与防控指南</p>
-
-        <div class="search-container">
-          <div class="search-wrapper">
-            <el-icon class="search-icon">
-              <Search/>
-            </el-icon>
-            <input
-                v-model="queryParams.keyword"
-                type="text"
-                placeholder="搜索感兴趣的新闻内容..."
-                class="custom-search-input"
-                @keyup.enter="handleSearch"
-            />
-            <button class="search-btn" @click="handleSearch">搜索</button>
-          </div>
-        </div>
       </div>
       <div class="header-bg-decoration"></div>
     </div>
@@ -189,67 +165,8 @@ const goToDetail = (news: NewsVO) => {
 .subtitle {
   font-size: 16px;
   color: rgba(255, 255, 255, 0.9);
-  margin-bottom: 40px;
+  margin-bottom: 0;
   font-weight: 300;
-}
-
-/* Search Bar */
-.search-container {
-  display: flex;
-  justify-content: center;
-}
-
-.search-wrapper {
-  display: flex;
-  align-items: center;
-  background: white;
-  padding: 8px;
-  border-radius: 50px;
-  width: 100%;
-  max-width: 600px;
-  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
-  transition: transform 0.3s ease;
-}
-
-.search-wrapper:focus-within {
-  transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
-}
-
-.search-icon {
-  font-size: 20px;
-  color: #94a3b8;
-  margin-left: 12px;
-  margin-right: 8px;
-}
-
-.custom-search-input {
-  flex: 1;
-  border: none;
-  outline: none;
-  font-size: 16px;
-  color: #1e293b;
-  background: transparent;
-  padding: 8px 0;
-}
-
-.custom-search-input::placeholder {
-  color: #cbd5e1;
-}
-
-.search-btn {
-  background: #3b82f6;
-  color: white;
-  border: none;
-  padding: 10px 24px;
-  border-radius: 40px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background 0.2s;
-}
-
-.search-btn:hover {
-  background: #2563eb;
 }
 
 /* Content Container */
