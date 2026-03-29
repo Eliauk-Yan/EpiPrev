@@ -1,8 +1,8 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
-import { getNewsList, type NewsVO } from "@/api/news";
-import { Search, ArrowRight } from "@element-plus/icons-vue";
+import {ref, onMounted} from "vue";
+import {useRouter} from "vue-router";
+import {getNewsList, type NewsVO} from "@/api/news";
+import {Search, ArrowRight} from "@element-plus/icons-vue";
 
 const router = useRouter();
 
@@ -11,7 +11,7 @@ const total = ref(0);
 const loading = ref(false);
 const queryParams = ref({
   page: 1,
-  size: 10,
+  size: 12,
   keyword: "",
 });
 
@@ -42,18 +42,22 @@ const handleSearch = () => {
 const handleCurrentChange = (page: number) => {
   queryParams.value.page = page;
   loadNews();
-  window.scrollTo({ top: 0, behavior: 'smooth' });
+  window.scrollTo({top: 0, behavior: 'smooth'});
 };
 
 onMounted(() => {
   loadNews();
 });
 
-const getLevelWrapperClass = (source: string) => {
-    if (source.includes('卫健委')) return 'source-tag primary';
-    if (source.includes('CDC')) return 'source-tag success';
-    return 'source-tag info';
+const goToDetail = (news: NewsVO) => {
+  // 通过路由 state 传递新闻数据，避免冗余API调用
+  router.push({
+    name: 'news-detail',
+    params: { id: news.id },
+    state: { news: JSON.parse(JSON.stringify(news)) } as any,
+  });
 };
+
 </script>
 
 <template>
@@ -62,18 +66,20 @@ const getLevelWrapperClass = (source: string) => {
       <div class="header-content">
         <h1 class="main-title">疫情动态</h1>
         <p class="subtitle">实时掌握最新疫情资讯与防控指南</p>
-        
+
         <div class="search-container">
           <div class="search-wrapper">
-             <el-icon class="search-icon"><Search /></el-icon>
-             <input 
+            <el-icon class="search-icon">
+              <Search/>
+            </el-icon>
+            <input
                 v-model="queryParams.keyword"
-                type="text" 
+                type="text"
                 placeholder="搜索感兴趣的新闻内容..."
                 class="custom-search-input"
                 @keyup.enter="handleSearch"
-             />
-             <button class="search-btn" @click="handleSearch">搜索</button>
+            />
+            <button class="search-btn" @click="handleSearch">搜索</button>
           </div>
         </div>
       </div>
@@ -81,54 +87,55 @@ const getLevelWrapperClass = (source: string) => {
     </div>
 
     <div class="content-container">
-      <div class="news-list" v-loading="loading">
+      <div v-loading="loading" class="news-list">
         <div
-          v-for="(news, index) in newsList"
-          :key="news.id"
-          class="news-card"
-          @click="router.push(`/news/${news.id}`)"
-          :style="{ animationDelay: `${index * 0.1}s` }"
+            v-for="(news, index) in newsList"
+            :key="news.id"
+            class="news-card"
+            :style="{ animationDelay: `${index * 0.1}s` }"
+            @click="goToDetail(news)"
         >
           <div class="date-badge">
             <span class="month">{{ news.publishTime ? news.publishTime.substring(5, 7) : '01' }}月</span>
             <span class="day">{{ news.publishTime ? news.publishTime.substring(8, 10) : '01' }}</span>
           </div>
-          
+
           <div class="card-content">
             <div class="card-header">
-              <span :class="getLevelWrapperClass(news.source)">
+              <span :class="'source-tag primary'">
                 {{ news.source }}
               </span>
               <span class="time-ago">{{ news.publishTime?.split(' ')[0] }}</span>
             </div>
-            
+
             <h3 class="news-title">{{ news.title }}</h3>
             <p class="news-summary">{{ news.summary }}</p>
-            
+
             <div class="card-footer">
               <span class="read-more">
-                阅读全文 <el-icon><ArrowRight /></el-icon>
+                阅读全文 <el-icon><ArrowRight/></el-icon>
               </span>
             </div>
           </div>
         </div>
-        
-        <el-empty 
-          v-if="!loading && newsList.length === 0" 
-          description="暂无相关新闻" 
-          image-size="200"
+
+        <el-empty
+            v-if="!loading && newsList.length === 0"
+            description="暂无相关新闻"
+            image-size="200"
         />
       </div>
 
       <!-- Pagination -->
-      <div class="pagination-section" v-if="total > 0">
+      <div v-if="total > 0" class="pagination-section">
         <el-pagination
-          background
-          layout="prev, pager, next"
-          :total="total"
-          v-model:current-page="queryParams.page"
-          :page-size="queryParams.size"
-          @current-change="handleCurrentChange"
+            v-model:current-page="queryParams.page"
+            background
+            layout="prev, pager, next, jumper"
+            :total="total"
+            :page-size="queryParams.size"
+            :pager-count="9"
+            @current-change="handleCurrentChange"
         />
       </div>
     </div>
@@ -159,9 +166,8 @@ const getLevelWrapperClass = (source: string) => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-image: 
-    radial-gradient(circle at 20% 30%, rgba(255,255,255,0.1) 0%, transparent 20%),
-    radial-gradient(circle at 80% 70%, rgba(255,255,255,0.1) 0%, transparent 20%);
+  background-image: radial-gradient(circle at 20% 30%, rgba(255, 255, 255, 0.1) 0%, transparent 20%),
+  radial-gradient(circle at 80% 70%, rgba(255, 255, 255, 0.1) 0%, transparent 20%);
   pointer-events: none;
 }
 
@@ -177,7 +183,7 @@ const getLevelWrapperClass = (source: string) => {
   font-weight: 800;
   margin-bottom: 12px;
   letter-spacing: -0.5px;
-  text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .subtitle {
@@ -201,13 +207,13 @@ const getLevelWrapperClass = (source: string) => {
   border-radius: 50px;
   width: 100%;
   max-width: 600px;
-  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+  box-shadow: 0 8px 30px rgba(0, 0, 0, 0.15);
   transition: transform 0.3s ease;
 }
 
 .search-wrapper:focus-within {
   transform: translateY(-2px);
-  box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
 }
 
 .search-icon {
@@ -421,17 +427,17 @@ const getLevelWrapperClass = (source: string) => {
   .page-header-section {
     padding: 40px 20px 60px;
   }
-  
+
   .main-title {
     font-size: 28px;
   }
-  
+
   .news-card {
     flex-direction: column;
     gap: 16px;
     padding: 20px;
   }
-  
+
   .date-badge {
     width: auto;
     height: auto;
@@ -441,7 +447,7 @@ const getLevelWrapperClass = (source: string) => {
     gap: 6px;
     justify-content: flex-start;
   }
-  
+
   .date-badge .day, .date-badge .month {
     font-size: 13px;
     font-weight: 500;

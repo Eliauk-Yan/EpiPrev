@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useRoute, useRouter } from "vue-router";
+import { useRouter } from "vue-router";
 import { ArrowLeft } from "@element-plus/icons-vue";
-import { getNewsDetail, type NewsVO } from "@/api/news";
+import { type NewsVO } from "@/api/news";
 
-const route = useRoute();
 const router = useRouter();
 
 const news = ref<NewsVO | null>(null);
@@ -20,16 +19,23 @@ function formatPara(text: string) {
     .replace(/\n/g, '<br>');
 }
 
-onMounted(async () => {
-    loading.value = true;
-    try {
-        const res = await getNewsDetail(route.params.id as string);
-        news.value = res ?? null;
-    } catch (e) {
-        news.value = null;
-    } finally {
-        loading.value = false;
+const fetchDetail = async () => {
+  loading.value = true;
+  try {
+    const state = history.state as { news?: NewsVO };
+    if (state.news) {
+      news.value = state.news;
+      return;
     }
+  } catch (error) {
+    console.error('加载新闻详情失败:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+onMounted(() => {
+  fetchDetail();
 });
 </script>
 
@@ -40,8 +46,13 @@ onMounted(async () => {
       返回列表
     </div>
 
-    <div v-loading="loading" class="article-wrapper">
-      <article v-if="news" class="article">
+    <div v-if="loading" class="loading-container">
+      <div class="loading-spinner"></div>
+      <p>正在加载新闻...</p>
+    </div>
+
+    <div v-else-if="news" class="article-wrapper">
+      <article class="article">
         <header class="article-header">
           <el-tag type="info">{{ news.source }}</el-tag>
           <h1>{{ news.title }}</h1>
@@ -54,10 +65,11 @@ onMounted(async () => {
           <p v-for="(para, idx) in (news.content || '').split('\n\n')" :key="idx" v-html="formatPara(para)"></p>
         </div>
       </article>
-      <el-empty v-else-if="!loading" description="新闻不存在或已被删除" :image-size="120">
-        <el-button type="primary" @click="router.back()">返回列表</el-button>
-      </el-empty>
     </div>
+
+    <el-empty v-else description="新闻不存在或已被删除" :image-size="120">
+      <el-button type="primary" @click="router.back()">返回列表</el-button>
+    </el-empty>
   </div>
 </template>
 
@@ -65,6 +77,34 @@ onMounted(async () => {
 .detail-page {
   max-width: 800px;
   margin: 0 auto;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+  color: #409EFF;
+}
+
+.loading-spinner {
+  width: 40px;
+  height: 40px;
+  border: 3px solid #e0e0e0;
+  border-top-color: #409EFF;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-container p {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #909399;
 }
 
 .article-wrapper {

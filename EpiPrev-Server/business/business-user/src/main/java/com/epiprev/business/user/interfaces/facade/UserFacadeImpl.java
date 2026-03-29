@@ -75,7 +75,7 @@ public class UserFacadeImpl implements UserFacade {
     public UserResponse<UserInfo> login(UserLoginRequest request) {
         // 1. 查找用户
         User user = userMapper.selectOne(
-                new LambdaQueryWrapper<User>().eq(User::getTelephone, request.getUsername())
+                new LambdaQueryWrapper<User>().eq(User::getNickName, request.getUsername())
                         .or().eq(User::getEmail, request.getUsername()));
         // 2. 用户校验
         if (user == null) {
