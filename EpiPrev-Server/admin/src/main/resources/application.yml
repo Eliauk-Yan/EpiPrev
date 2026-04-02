@@ -3,7 +3,7 @@ server:
 
 spring:
   application:
-    name: admin
+    name: epiprev-admin
   config:
     import:
       - classpath:config.yml

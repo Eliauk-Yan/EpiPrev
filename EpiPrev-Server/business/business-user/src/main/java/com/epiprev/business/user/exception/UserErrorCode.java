@@ -10,6 +10,8 @@ public enum UserErrorCode implements ErrorCode {
 
     ILLEGAL_USER_STATE("ILLEGAL_USER_STATE", "用户状态非法"),
 
+    REAL_NAME_AUTH_SERVICE_ERROR("REAL_NAME_AUTH_SERVICE_ERROR", "用户实名认证错误"),
+
     USER_NOT_FOUND("USER_NOT_FOUND", "用户没有找到"),
 
     USER_UPDATE_FAILED("USER_UPDATE_FAILED", "用户更新失败"),

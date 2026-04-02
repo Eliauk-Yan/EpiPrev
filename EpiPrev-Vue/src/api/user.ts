@@ -73,3 +73,14 @@ export function updateAvatar(file: File) {
 export function updateNickName(nickName: string) {
     return request.post<any, boolean>("/user/modifyNickName", null, { params: { nickName } });
 }
+
+/** Real Name Auth Data */
+export interface RealNameAuthData {
+    realName: string;
+    idCard: string;
+}
+
+/** Real Name Auth API */
+export function realNameAuth(data: RealNameAuthData) {
+    return request.post<any, boolean>("/user/realNameAuth", data);
+}

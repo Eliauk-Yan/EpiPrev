@@ -3,9 +3,11 @@ package com.epiprev.business.user.interfaces.controller;
 import cn.dev33.satoken.stp.StpUtil;
 import com.epiprev.business.user.domain.entity.User;
 import com.epiprev.business.user.exception.UserException;
+import com.epiprev.business.user.interfaces.controller.params.RealNameAuthParam;
+import com.epiprev.business.user.service.UserAuthService;
 import com.epiprev.business.user.service.UserService;
+import com.epiprev.business.user.service.impl.UserCacheService;
 import com.epiprev.common.api.user.response.data.UserInfo;
-import com.epiprev.common.base.exception.BusinessException;
 import com.epiprev.common.file.service.FileService;
 import com.epiprev.common.web.result.Result;
 import lombok.RequiredArgsConstructor;
@@ -29,6 +31,16 @@ public class UserController {
      * 用户服务
      */
     private final UserService userService;
+
+    /**
+     * 用户缓存服务
+     */
+    private final UserCacheService userCacheService;
+
+    /**
+     * 用户认证服务
+     */
+    private final UserAuthService userAuthService;
 
     /**
      * 文件服务
@@ -87,5 +99,23 @@ public class UserController {
         }
         user.setNickName(nickName);
         return Result.success(userService.updateUserById(user));
+    }
+
+    /**
+     * 实名认证
+     */
+    @PostMapping("/realNameAuth")
+    public Result<Boolean> realNameAuth(@RequestBody RealNameAuthParam param) {
+        Boolean result = userAuthService.realNameAuth(param);
+        if (result) {
+            User user = userService.getUserById(StpUtil.getLoginIdAsLong());
+            user.setRealName(param.getRealName());
+            user.setIdCardHash(param.getIdCard());
+            user.setCertification(true);
+            user.auth();
+            Boolean updateResult = userService.updateUserById(user);
+            return Result.success(updateResult);
+        }
+        return Result.success(false);
     }
 }

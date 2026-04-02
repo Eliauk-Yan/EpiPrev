@@ -2,7 +2,7 @@ server:
   port: 9001
 spring:
   application:
-    name: business-user
+    name: business-epiprev-user
   config:
     import:
       - classpath:datasource.yml

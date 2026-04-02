@@ -2,6 +2,7 @@ package com.epiprev.business.user.service;
 
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.epiprev.business.user.domain.entity.User;
+import com.epiprev.business.user.interfaces.controller.params.RealNameAuthParam;
 import com.epiprev.common.api.user.constant.UserState;
 
 public interface UserService extends IService<User> {

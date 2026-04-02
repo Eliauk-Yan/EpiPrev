@@ -1,6 +1,8 @@
 package com.epiprev.business.user.domain.entity;
 
+import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableName;
+import com.epiprev.business.user.config.AesEncryptTypeHandler;
 import com.epiprev.common.api.user.constant.UserRole;
 import com.epiprev.common.api.user.constant.UserState;
 import com.epiprev.common.datasource.entity.BaseEntity;
@@ -36,8 +38,10 @@ public class User extends BaseEntity implements Serializable {
 
     private Boolean certification;
 
+    @TableField(typeHandler = AesEncryptTypeHandler.class)
     private String realName;
 
+    @TableField(typeHandler = AesEncryptTypeHandler.class)
     private String idCardHash;
 
     public void register(String nickName, String password, String email) {

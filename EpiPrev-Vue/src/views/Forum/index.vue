@@ -154,12 +154,14 @@ const handleSubmitPost = async () => {
     return;
   }
   try {
-    await createPost(newPost.value);
+    const res = await createPost(newPost.value);
     newPost.value = { title: "", content: "" };
     newPostVisible.value = false;
-    ElMessage.success("发布成功");
-    fetchPosts();
-    fetchHotPosts();
+    if (res.data) {
+      ElMessage.success("发布成功");
+      fetchPosts();
+      fetchHotPosts();
+    }
     if (activeMenu.value === "mine") fetchMyPosts();
   } catch (error) {
     console.error("Failed to create post", error);

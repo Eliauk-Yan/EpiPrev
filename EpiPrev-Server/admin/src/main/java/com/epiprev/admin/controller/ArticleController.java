@@ -11,7 +11,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/article")
+@RequestMapping("/admin/article")
 @RequiredArgsConstructor
 public class ArticleController {
 

@@ -1,10 +1,11 @@
 <script setup lang="ts">
 import { useUserStore } from "@/stores/user";
-import { ref, onMounted, watch } from "vue";
-import { getUserInfo, updateAvatar, updateNickName } from "@/api/user";
+import { ref, reactive, onMounted, watch } from "vue";
+import type { FormInstance, FormRules } from "element-plus";
+import { getUserInfo, updateAvatar, updateNickName, realNameAuth } from "@/api/user";
 import { ElMessage, ElMessageBox } from "element-plus";
 import { useRouter } from "vue-router";
-import { Camera } from "@element-plus/icons-vue";
+import { Camera, User, CreditCard } from "@element-plus/icons-vue";
 
 const userStore = useUserStore();
 const router = useRouter();
@@ -94,6 +95,77 @@ const getStateLabel = (state: string | undefined) => {
   return state ? (states[state] || state) : '未知状态';
 };
 
+const authDialogVisible = ref(false);
+const authFormRef = ref<FormInstance>();
+const authLoading = ref(false);
+
+const authForm = reactive({
+  realName: "",
+  idCard: "",
+});
+
+const validateIdCard = (_rule: unknown, value: string, callback: (error?: Error) => void) => {
+  const reg = /^[1-9]\d{5}(18|19|20)\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}[\dXx]$/;
+  if (!value) {
+    callback(new Error("请输入身份证号"));
+  } else if (!reg.test(value)) {
+    callback(new Error("请输入正确的身份证号"));
+  } else {
+    callback();
+  }
+};
+
+const authRules: FormRules = {
+  realName: [
+    { required: true, message: "请输入真实姓名", trigger: "blur" },
+    { min: 2, max: 20, message: "姓名长度为2-20个字符", trigger: "blur" },
+    { pattern: /^[\u4e00-\u9fa5]+$/, message: "姓名只能包含中文", trigger: "blur" },
+  ],
+  idCard: [
+    { required: true, message: "请输入身份证号", trigger: "blur" },
+    { validator: validateIdCard, trigger: "blur" },
+  ],
+};
+
+const openAuthDialog = () => {
+  authForm.realName = "";
+  authForm.idCard = "";
+  authDialogVisible.value = true;
+};
+
+const handleAuthSubmit = async (formEl: FormInstance | undefined) => {
+  if (!formEl) return;
+  await formEl.validate(async (valid) => {
+    if (valid) {
+      authLoading.value = true;
+      try {
+        const result = await realNameAuth({
+          realName: authForm.realName,
+          idCard: authForm.idCard,
+        });
+        if (result) {
+          ElMessage.success("实名认证成功");
+          authDialogVisible.value = false;
+          const res = await getUserInfo();
+          if (res) {
+            userStore.setUser(res, userStore.token);
+          }
+        } else {
+          ElMessage.error("实名认证失败，请检查信息是否正确");
+        }
+      } catch (error) {
+      } finally {
+        authLoading.value = false;
+      }
+    }
+  });
+};
+
+const handleAuthClose = () => {
+  authFormRef.value?.resetFields();
+  authDialogVisible.value = false;
+};
+
 onMounted(async () => {
     try {
         const res = await getUserInfo();
@@ -134,9 +206,19 @@ onMounted(async () => {
                 <el-tag size="small" :type="userStore.user?.role === 'ADMIN' ? 'danger' : 'success'">
                   {{ getRoleLabel(userStore.user?.role) }}
                 </el-tag>
-                <el-tag size="small" :type="userStore.user?.certification ? 'primary' : 'info'" effect="plain">
-                  {{ userStore.user?.certification ? '已实名' : '未实名' }}
+                <el-tag v-if="userStore.user?.certification" size="small" type="primary" effect="plain">
+                  已实名
                 </el-tag>
+                <el-button
+                  v-else
+                  size="small"
+                  type="primary"
+                  plain
+                  class="auth-btn"
+                  @click="openAuthDialog"
+                >
+                  去认证
+                </el-button>
               </div>
             </div>
           </div>
@@ -194,6 +276,66 @@ onMounted(async () => {
           <el-button type="danger" plain class="logout-btn" @click="handleLogout">退出登录</el-button>
         </div>
       </div>
+
+      <el-dialog
+        v-model="authDialogVisible"
+        title="实名认证"
+        width="480px"
+        :close-on-click-modal="false"
+        class="auth-dialog"
+        @close="handleAuthClose"
+      >
+        <div class="dialog-content">
+          <el-alert
+            title="安全提示"
+            type="info"
+            :closable="false"
+            show-icon
+            class="security-alert"
+          >
+            <template #default>
+              您的信息将被加密存储，仅用于身份验证，我们承诺保护您的隐私安全
+            </template>
+          </el-alert>
+
+          <el-form
+            ref="authFormRef"
+            :model="authForm"
+            :rules="authRules"
+            label-position="top"
+            size="large"
+            class="auth-form"
+          >
+            <el-form-item label="真实姓名" prop="realName">
+              <el-input
+                v-model="authForm.realName"
+                placeholder="请输入您的真实姓名"
+                :prefix-icon="User"
+                maxlength="20"
+                show-word-limit
+              />
+            </el-form-item>
+            <el-form-item label="身份证号" prop="idCard">
+              <el-input
+                v-model="authForm.idCard"
+                placeholder="请输入18位身份证号码"
+                :prefix-icon="CreditCard"
+                maxlength="18"
+                show-word-limit
+              />
+            </el-form-item>
+          </el-form>
+        </div>
+
+        <template #footer>
+          <span class="dialog-footer">
+            <el-button @click="handleAuthClose">取消</el-button>
+            <el-button type="primary" :loading="authLoading" @click="handleAuthSubmit(authFormRef)">
+              {{ authLoading ? '认证中...' : '立即认证' }}
+            </el-button>
+          </span>
+        </template>
+      </el-dialog>
     </div>
   </div>
 </template>
@@ -298,6 +440,18 @@ onMounted(async () => {
 .tag-group {
   display: flex;
   gap: 8px;
+  align-items: center;
+}
+
+.auth-btn {
+  border-radius: 12px;
+  font-weight: 600;
+  transition: all 0.3s;
+}
+
+.auth-btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(64, 158, 255, 0.3);
 }
 
 .avatar-wrapper {
@@ -467,5 +621,57 @@ onMounted(async () => {
   max-width: 200px;
   border-radius: 12px;
   padding: 12px;
+}
+
+.auth-dialog :deep(.el-dialog__header) {
+  padding: 20px 24px 0;
+  border-bottom: none;
+}
+
+.auth-dialog :deep(.el-dialog__title) {
+  font-size: 20px;
+  font-weight: 700;
+  background: linear-gradient(120deg, #409EFF, #67C23A);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.auth-dialog :deep(.el-dialog__body) {
+  padding: 20px 24px;
+}
+
+.auth-dialog :deep(.el-dialog__footer) {
+  padding: 16px 24px 20px;
+  border-top: 1px solid rgba(0,0,0,0.05);
+}
+
+.dialog-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.security-alert {
+  border-radius: 12px;
+}
+
+.security-alert :deep(.el-alert__content) {
+  font-size: 13px;
+}
+
+.auth-form {
+  margin-top: 8px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.dialog-footer .el-button {
+  border-radius: 8px;
+  padding: 10px 24px;
 }
 </style>

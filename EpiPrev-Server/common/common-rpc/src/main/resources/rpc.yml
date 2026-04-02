@@ -1,6 +1,6 @@
 dubbo:
   consumer:
-    timeout: 5000
+    timeout: 10000
     check: false
   protocol:
     name: dubbo
@@ -9,10 +9,11 @@ dubbo:
   registry:
     address: nacos://47.99.39.81:8848
     parameters:
-      namespace: b668cde8-b9d1-431c-b94d-c445be411f48
-      group: dubbo
+      namespace: 5f3f247e-ce23-4446-bcd3-dd3edc28c35c
+      group: epiprev-dubbo
   application:
     name: ${spring.application.name}
-    serialize-check-status: DISABLE # 或 DISABLE（彻底关闭，不建议线上用）
-#    qos-enable: true # 是否启用 Dubbo QOS（在线运维命令端口）
-#    qos-accept-foreign-ip: false # QOS 是否接受非本机 IP 的连接（安全设置）
+    serialize-check-status: WARN # 或 DISABLE（彻底关闭，不建议线上用）
+    # 多应用同机部署时默认 22222 端口冲突，关闭 QOS 避免 Address already in use
+    qos-enable: false
+#    qos-accept-foreign-ip: false #  QOS 是否接受非本机 IP 的连接（安全设置）

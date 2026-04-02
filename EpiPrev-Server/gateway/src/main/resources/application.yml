@@ -5,7 +5,7 @@ server:
 spring:
   application:
     # 当前应用名称（注册到 Nacos 的服务名）
-    name: gateway
+    name: epiprev-gateway
   config:
     # 引入公共配置（Redis、Nacos 等）
     import:
@@ -22,13 +22,13 @@ spring:
               lower-case-service-id: true
           routes:
             # 认证中心路由
-            - id: auth
-              uri: lb://auth
+            - id: epiprev-auth
+              uri: lb://epiprev-auth
               predicates:
                 - Path=/auth/**
             # 用户服务路由
-            - id: business-user
-              uri: lb://business-user
+            - id: business-epiprev-user
+              uri: lb://business-epiprev-user
               predicates:
                 - Path=/user/**
             # 文章服务路由
@@ -42,8 +42,8 @@ spring:
               predicates:
                 - Path=/forum/**
             # 管理后台服务
-            - id: admin
-              uri: lb://admin
+            - id: epiprev-admin
+              uri: lb://epiprev-admin
               predicates:
                 - Path=/admin/**
             # 健康分析模块

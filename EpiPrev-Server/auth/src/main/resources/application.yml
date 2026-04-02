@@ -2,7 +2,7 @@ server:
   port: 9000
 spring:
   application:
-    name: auth
+    name: epiprev-auth
   config:
     import:
       - classpath:cache.yml
