@@ -37,12 +37,6 @@
             <artifactId>common-config</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
-        <!--公共web-->
-        <dependency>
-            <groupId>com.epiprev.common.web</groupId>
-            <artifactId>common-web</artifactId>
-            <version>1.0-SNAPSHOT</version>
-        </dependency>
         <!--缓存-->
         <dependency>
             <groupId>com.epiprev.common.cache</groupId>
